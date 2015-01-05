@@ -1,7 +1,7 @@
-from src.DistanceMap import DistanceMap
-from src.TrafficFrame import TrafficFrame
-from src.Airplane import Airplane
-from src.Flight import Flight
+from DistanceMap import DistanceMap
+from TrafficFrame import TrafficFrame
+from Airplane import Airplane
+from Flight import Flight
 from random import randint
 
 class Traffic(object):
@@ -59,9 +59,9 @@ class Traffic(object):
             traffic[i] = Airplane(i, self.cities[i], self.cities[i], self.COLOR[i])
 
             city1 = traffic[i].getCurrentCity()
-            passengers1 = 300
+            passengers1 = 100
             city2 = self.cities[5]
-            passengers2 = 150
+            passengers2 = 100
             city3 = self.cities[14]
             passengers3 = 100
             city4 = self.cities[21]

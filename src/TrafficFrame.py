@@ -1,5 +1,5 @@
 from Tkinter import *
-import ImageTk
+from PIL import ImageTk
 
 class TrafficFrame(object):
     def __init__(self, traffic):
@@ -15,10 +15,9 @@ class TrafficFrame(object):
         self.canvas = Canvas(self.frame, 
                              bg="white", 
                              width=701, 
-                             height=599,
-                             cursor="PLUS")
+                             height=599)
         
-        self.image = ImageTk.PhotoImage(file = "C:/Users/bushra/workspace/MokumAirways/resources/europe-scaled.png")
+        self.image = ImageTk.PhotoImage(file = "../resources/europe-scaled.png")
         self.canvas.create_image(0, 0, image = self.image, anchor = NW)   
         
         self.canvas.bind("<Button-1>", self.processMouseEvent)
