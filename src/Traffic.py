@@ -59,7 +59,7 @@ class Traffic(object):
             traffic[i] = Airplane(i, self.cities[i], self.cities[i], self.COLOR[i])
 
             city1 = traffic[i].getCurrentCity()
-            passengers1 = 100
+            passengers1 = 90
             city2 = self.cities[5]
             passengers2 = 100
             city3 = self.cities[14]
