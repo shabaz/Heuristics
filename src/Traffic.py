@@ -4,6 +4,8 @@ from Airplane import Airplane
 from Flight import Flight
 from random import randint
 
+from createSubtour import create_subtour
+
 class Traffic(object):
     NUMBER_OF_AIRPLANES = 1
     
@@ -46,8 +48,6 @@ class Traffic(object):
         self.traffic = self.setAirplanes()
         self.frame = TrafficFrame(self.traffic)
         self.frame.setCities(self.cities)
-        # an example of a distance between two cities
-        self.frame.showDistance(self.cities[0], self.cities[1])
         self.frame.setTraffic()
         
     def setAirplanes(self):
@@ -56,48 +56,35 @@ class Traffic(object):
         traffic = [0 for x in range(self.NUMBER_OF_AIRPLANES)]
         
         for i in range(len(traffic)):
-            traffic[i] = Airplane(i, self.cities[i], self.cities[i], self.COLOR[i])
+            traffic[i] = Airplane(i, self.cities[0], self.cities[0], self.COLOR[i])
 
-            city1 = traffic[i].getCurrentCity()
-            passengers1 = 100
-            city2 = self.cities[5]
-            passengers2 = 100
-            city3 = self.cities[14]
-            passengers3 = 100
-            city4 = self.cities[21]
-                
-            flight1 = Flight(passengers1,
-                            self.currentTime, 
-                            city1, 
-                            (float(city1.getDistanceTo(city2.getIndex())) / traffic[i].getAirplaneSpeed() * 60) + self.currentTime, 
-                            city2, 
-                            city1.getDistanceTo(city2.getIndex()), 
-                            False)
-            self.updatePassengerTable(city1, city2, passengers1)
-            self.currentTime += flight1.getTotalTimeFlight()
-            traffic[i].addFlight(flight1)
-            
-            flight2 = Flight(passengers2,
-                            self.currentTime, 
-                            city2, 
-                            (float(city2.getDistanceTo(city3.getIndex())) / traffic[i].getAirplaneSpeed() * 60) + self.currentTime, 
-                            city3, 
-                            city2.getDistanceTo(city3.getIndex()), 
-                            True)
-            self.updatePassengerTable(city2, city3, passengers2)
-            self.currentTime += flight2.getTotalTimeFlight()
-            traffic[i].addFlight(flight2)
-            
-            flight3 = Flight(passengers3,
-                            self.currentTime, 
-                            city3, 
-                            (float(city3.getDistanceTo(city4.getIndex())) / traffic[i].getAirplaneSpeed() * 60) + self.currentTime, 
-                            city4, 
-                            city3.getDistanceTo(city4.getIndex()), 
-                            False)
-            self.updatePassengerTable(city3, city4, passengers3)
-            self.currentTime += flight3.getTotalTimeFlight()
-            traffic[i].addFlight(flight3)
+            tour = create_subtour([0], [0])
+            print "tour:", tour
+
+            prev_city = self.cities[tour[0]]
+            prev_flight = None
+            for j in tour[1:]:
+                next_city = self.cities[j]
+
+                flight_distance = prev_city.getDistanceTo(next_city.getIndex())
+                if flight_distance + traffic[i].distanceCovered > Airplane.MAX_DISTANCE:
+                    prev_flight.setRefuel()
+
+                passengers =  min(self.PASSENGERS[prev_city.getIndex()][j], 199)
+
+                flight = Flight(passengers,
+                        self.currentTime, 
+                        prev_city, 
+                        (float(prev_city.getDistanceTo(next_city.getIndex())) / traffic[i].getAirplaneSpeed() * 60) + self.currentTime, 
+                        next_city, 
+                        prev_city.getDistanceTo(next_city.getIndex()), 
+                        False)
+                self.updatePassengerTable(prev_city, next_city, passengers)
+                self.currentTime += flight.getTotalTimeFlight()
+                traffic[i].addFlight(flight)
+                prev_city = next_city
+                prev_flight = flight
+
             
         return traffic
     

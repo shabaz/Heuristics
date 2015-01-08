@@ -50,7 +50,7 @@ def create_subtour(start_tour, end_tour):
             new_subtour.append(next_city)
             start_node = next_city
         else:
-            print start_tour + new_subtour + end_tour
+            return start_tour + new_subtour + end_tour
             break
 
-create_subtour([0], [0])
+
