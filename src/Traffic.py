@@ -69,6 +69,7 @@ class Traffic(object):
                 flight_distance = prev_city.getDistanceTo(next_city.getIndex())
                 if flight_distance + traffic[i].distanceCovered > Airplane.MAX_DISTANCE:
                     prev_flight.setRefuel()
+                    traffic[i].distanceCovered = 0 # fill the tank of plane 
 
                 passengers =  min(self.PASSENGERS[prev_city.getIndex()][j], 199)
 
