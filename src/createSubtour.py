@@ -38,6 +38,7 @@ def create_subtour(start_tour, end_tour):
         if (feasible_next_cities):
             next_city = random.choice(feasible_next_cities)
             new_subtour.append(next_city)
+            start_node = next_city
         else:
             print start_tour + new_subtour + end_tour
             break
