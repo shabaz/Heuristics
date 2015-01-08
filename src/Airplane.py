@@ -1,7 +1,7 @@
 class Airplane(object):
     MAX_PASSENGERS = 199
     MAX_DISTANCE = 3199
-    AIRPLANE_SPEED = 800
+    AIRPLANE_SPEED = 800        # km/h
     MAX_NUMBER_OF_FLIGHTS = 20
     MINUTES_PER_DAY = 1200
     
