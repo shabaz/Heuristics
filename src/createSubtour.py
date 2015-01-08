@@ -9,14 +9,14 @@ def check_feasible(tour):
     prev_city = tour[0]
 
 
-    time_refueling = 0 # TODO
+    time_refueling = 0 
     tank_capacity_in_kms = Airplane.MAX_DISTANCE
 
     for i in tour[1:]:
         next_distance = DistanceMap.DISTANCES[prev_city][i]
-        if next_distance > Airplane.MAX_DISTANCE:
+        if next_distance >= Airplane.MAX_DISTANCE:
             return False
-        if next_distance > tank_capacity_in_kms:
+        if next_distance >= tank_capacity_in_kms:
             time_refueling += Flight.REFUEL_TIME
             tank_capacity_in_kms = Airplane.MAX_DISTANCE
         total_distance += next_distance

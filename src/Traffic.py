@@ -53,41 +53,62 @@ class Traffic(object):
     def setAirplanes(self):
         #an example of a flight plan
         #try to change values to create a frame
-        traffic = [0 for x in range(self.NUMBER_OF_AIRPLANES)]
-        
-        for i in range(len(traffic)):
-            traffic[i] = Airplane(i, self.cities[0], self.cities[0], self.COLOR[i])
 
-            tour = create_subtour([0], [0])
-            print "tour:", tour
 
-            prev_city = self.cities[tour[0]]
-            prev_flight = None
-            for j in tour[1:]:
-                next_city = self.cities[j]
+        best_traffic = None
+        best_score = 0
+        best_passengers = None
+        best_current_time = None
+       
+        for m in xrange(100000):
 
-                flight_distance = prev_city.getDistanceTo(next_city.getIndex())
-                if flight_distance + traffic[i].distanceCovered > Airplane.MAX_DISTANCE:
-                    prev_flight.setRefuel()
-                    traffic[i].distanceCovered = 0 # fill the tank of plane 
+            traffic = [0 for x in range(self.NUMBER_OF_AIRPLANES)]
+            for i in range(len(traffic)):
+                traffic[i] = Airplane(i, self.cities[0], self.cities[0], self.COLOR[i])
 
-                passengers =  min(self.PASSENGERS[prev_city.getIndex()][j], 199)
+                tour = create_subtour([0], [0])
 
-                flight = Flight(passengers,
-                        self.currentTime, 
-                        prev_city, 
-                        (float(prev_city.getDistanceTo(next_city.getIndex())) / traffic[i].getAirplaneSpeed() * 60) + self.currentTime, 
-                        next_city, 
-                        prev_city.getDistanceTo(next_city.getIndex()), 
-                        False)
-                self.updatePassengerTable(prev_city, next_city, passengers)
-                self.currentTime += flight.getTotalTimeFlight()
-                traffic[i].addFlight(flight)
-                prev_city = next_city
-                prev_flight = flight
+                prev_city = self.cities[tour[0]]
+                prev_flight = None
+                for j in tour[1:]:
+                    next_city = self.cities[j]
 
-            
-        return traffic
+                    flight_distance = prev_city.getDistanceTo(next_city.getIndex())
+                    if flight_distance + traffic[i].distanceCovered >= Airplane.MAX_DISTANCE:
+                        prev_flight.setRefuel()
+                        traffic[i].distanceCovered = 0 # fill the tank of plane 
+
+                    passengers =  min(self.PASSENGERS[prev_city.getIndex()][j], 199)
+
+                    flight = Flight(passengers,
+                            self.currentTime, 
+                            prev_city, 
+                            (float(prev_city.getDistanceTo(next_city.getIndex())) / traffic[i].getAirplaneSpeed() * 60) + self.currentTime, 
+                            next_city, 
+                            prev_city.getDistanceTo(next_city.getIndex()), 
+                            False)
+                    self.updatePassengerTable(prev_city, next_city, passengers)
+                    self.currentTime += flight.getTotalTimeFlight()
+                    traffic[i].addFlight(flight)
+                    prev_city = next_city
+                    prev_flight = flight
+
+                traffic_points = 0
+                for airplane in traffic:
+                    traffic_points += airplane.getAirplanePoints()
+                if traffic_points > best_score:
+                    print "new best score:", traffic_points
+                    best_score = traffic_points
+                    best_traffic = traffic
+                    best_passengers = self.passengers
+                    best_current_time = self.currentTime
+                self.passengers = self.PASSENGERS
+                self.currentTime = 0
+
+
+        self.passengers = best_passengers
+        self.currentTime = best_current_time
+        return best_traffic
     
     def updatePassengerTable(self, city1, city2, numberOfPassengers):
         if(self.passengers[city1.getIndex()][city2.getIndex()] < numberOfPassengers):
