@@ -2,7 +2,7 @@ from DistanceMap import DistanceMap
 from TrafficFrame import TrafficFrame
 from Airplane import Airplane
 from Flight import Flight
-from random import randint
+from random import randint, randrange
 
 from createSubtour import create_subtour
 
@@ -59,14 +59,23 @@ class Traffic(object):
         best_score = 0
         best_passengers = None
         best_current_time = None
+        prev_tour = None
        
-        for m in xrange(100000):
+        for m in xrange(1000):
 
             traffic = [0 for x in range(self.NUMBER_OF_AIRPLANES)]
             for i in range(len(traffic)):
                 traffic[i] = Airplane(i, self.cities[0], self.cities[0], self.COLOR[i])
 
-                tour = create_subtour([0], [0])
+                if not prev_tour:
+                    tour = create_subtour([0], [0])
+                else:
+                    # generate new tour by changing previous one
+                    start_index = randrange(1, len(prev_tour)-1)
+                    end_index = randrange(start_index, len(prev_tour)-1)
+                    start_tour = prev_tour[:start_index+1]
+                    end_tour = prev_tour[end_index:]
+                    tour = create_subtour(start_tour, end_tour)
 
                 prev_city = self.cities[tour[0]]
                 prev_flight = None
@@ -102,6 +111,7 @@ class Traffic(object):
                     best_traffic = traffic
                     best_passengers = self.passengers
                     best_current_time = self.currentTime
+                    prev_tour = tour
                 self.passengers = self.PASSENGERS
                 self.currentTime = 0
 
