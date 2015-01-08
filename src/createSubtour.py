@@ -8,16 +8,26 @@ def check_feasible(tour):
     total_distance = 0
     prev_city = tour[0]
 
+
+    time_refueling = 0 # TODO
+    tank_capacity_in_kms = Airplane.MAX_DISTANCE
+
     for i in tour[1:]:
-        total_distance += DistanceMap.DISTANCES[prev_city][i]
+        next_distance = DistanceMap.DISTANCES[prev_city][i]
+        if next_distance > Airplane.MAX_DISTANCE:
+            return False
+        if next_distance > tank_capacity_in_kms:
+            time_refueling += Flight.REFUEL_TIME
+            tank_capacity_in_kms = Airplane.MAX_DISTANCE
+        total_distance += next_distance
+        tank_capacity_in_kms -= next_distance
         prev_city = i
 
     time_in_air = float(total_distance) / Airplane.AIRPLANE_SPEED * 60.0
     time_docking = (len(tour)-1) * Flight.DOCKING_TIME
-    time_refueling = 0 # TODO
 
 
-    return time_in_air + time_docking <= Airplane.MINUTES_PER_DAY
+    return time_in_air + time_docking + time_refueling <= Airplane.MINUTES_PER_DAY
 
 
 def create_subtour(start_tour, end_tour):
