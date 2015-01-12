@@ -24,7 +24,7 @@ def choose_transition(new_points, prev_points, temperature):
         
 
 class Traffic(object):
-    NUMBER_OF_AIRPLANES = 1
+    NUMBER_OF_AIRPLANES = 6
     
     PASSENGERS = [[0,213,119,278,89,302,388,153,341,273,112,361,302,324,269,206,147,400,367,172,45,321,100,135,86,95,257,371],
                   [373,0,377,341,202,161,354,182,424,69,96,52,141,5,224,425,277,88,380,290,444,89,0,28,376,296,323,7],
@@ -76,7 +76,7 @@ class Traffic(object):
         best_score = 0
         best_passengers = None
         best_current_time = None
-        prev_tour = None
+        prev_tours = None
 
         f = open("score_over_time.dat", "w")
         
@@ -85,13 +85,21 @@ class Traffic(object):
         for m in xrange(10000):
 
             traffic = [0 for x in range(self.NUMBER_OF_AIRPLANES)]
+
+            if not prev_tours:
+                tours = []
+                for i in xrange(self.NUMBER_OF_AIRPLANES):
+                    tours.append(gen_tour())
+                
+            else:
+                changing_flight = random.randrange(0,self.NUMBER_OF_AIRPLANES)
+                tours = copy.deepcopy(prev_tours)
+                tours[changing_flight] = permutate_tour(tours[changing_flight])
+
             for i in range(len(traffic)):
+                tour = tours[i]
                 traffic[i] = Airplane(i, self.cities[0], self.cities[0], self.COLOR[i])
 
-                if not prev_tour:
-                    tour = gen_tour()
-                else:
-                    tour = permutate_tour(prev_tour)
                 #tour = [0, 25, 20, 6, 27, 16, 11]
                 #tour = [0, 26, 14, 22, 13, 24]
                 #tour = [0, 1, 15, 25, 21]
@@ -128,7 +136,7 @@ class Traffic(object):
 
             if choose_transition(traffic_points, best_score, temperature):
             #if traffic_points > best_score:
-                print tour
+                print tours
                 print "new best score:", traffic_points
                 print "temperature:", temperature
                 #debug code
@@ -140,7 +148,7 @@ class Traffic(object):
                 best_traffic = traffic
                 best_passengers = self.passengers
                 best_current_time = self.currentTime
-                prev_tour = tour
+                prev_tours = tours
             self.passengers = copy.deepcopy(self.PASSENGERS)
             self.currentTime = 0.0
 
