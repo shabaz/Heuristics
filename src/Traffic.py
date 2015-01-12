@@ -2,9 +2,24 @@ from DistanceMap import DistanceMap
 from TrafficFrame import TrafficFrame
 from Airplane import Airplane
 from Flight import Flight
-from random import randint, randrange
+from random import randint, randrange, random
+import math
+import copy
 
 from createSubtour import create_subtour
+from newsubtourgen import *
+
+
+
+def choose_transition(new_points, prev_points, temperature):
+    if new_points > prev_points:
+        return True
+    else:
+        new_points = 1.0/(new_points+1)
+        prev_points = 1.0/(prev_points+1)
+        transition_probability = math.exp((prev_points - new_points)/temperature)
+        return random.random() < transition_probability
+        
 
 class Traffic(object):
     NUMBER_OF_AIRPLANES = 1
@@ -42,7 +57,7 @@ class Traffic(object):
     
     def __init__(self):
         self.currentTime = 0.0
-        self.passengers = self.PASSENGERS
+        self.passengers = copy.deepcopy(self.PASSENGERS)
         self.distanceMap = DistanceMap()
         self.cities = self.distanceMap.getCities()
         self.traffic = self.setAirplanes()
@@ -60,6 +75,8 @@ class Traffic(object):
         best_passengers = None
         best_current_time = None
         prev_tour = None
+        
+        temperature = 30
        
         for m in xrange(1000):
 
@@ -68,18 +85,15 @@ class Traffic(object):
                 traffic[i] = Airplane(i, self.cities[0], self.cities[0], self.COLOR[i])
 
                 if not prev_tour:
-                    tour = create_subtour([0], [0])
+                    tour = gen_tour()
                 else:
-                    # generate new tour by changing previous one
-                    start_index = randrange(1, len(prev_tour)-1)
-                    end_index = randrange(start_index, len(prev_tour)-1)
-                    start_tour = prev_tour[:start_index+1]
-                    end_tour = prev_tour[end_index:]
-                    tour = create_subtour(start_tour, end_tour)
+                    tour = permutate_tour(prev_tour)
+                #tour = [0, 25, 20, 6, 27, 16, 11]
+                #tour = [0, 26, 14, 22, 13, 24]
 
                 prev_city = self.cities[tour[0]]
                 prev_flight = None
-                for j in tour[1:]:
+                for j in tour[1:]+[tour[0]]:
                     next_city = self.cities[j]
 
                     flight_distance = prev_city.getDistanceTo(next_city.getIndex())
@@ -87,7 +101,7 @@ class Traffic(object):
                         prev_flight.setRefuel()
                         traffic[i].distanceCovered = 0 # fill the tank of plane 
 
-                    passengers =  min(self.PASSENGERS[prev_city.getIndex()][j], Airplane.MAX_PASSENGERS)
+                    passengers =  min(self.passengers[prev_city.getIndex()][j], 199)
 
                     flight = Flight(passengers,
                             self.currentTime, 
@@ -101,19 +115,31 @@ class Traffic(object):
                     traffic[i].addFlight(flight)
                     prev_city = next_city
                     prev_flight = flight
+                    #print "traffic point", traffic[i].getAirplanePoints()
 
-                traffic_points = 0
-                for airplane in traffic:
-                    traffic_points += airplane.getAirplanePoints()
-                if traffic_points > best_score:
-                    print "new best score:", traffic_points
-                    best_score = traffic_points
-                    best_traffic = traffic
-                    best_passengers = self.passengers
-                    best_current_time = self.currentTime
-                    prev_tour = tour
-                self.passengers = self.PASSENGERS
-                self.currentTime = 0
+            traffic_points = 0
+            for airplane in traffic:
+                traffic_points += airplane.getAirplanePoints()
+
+            if choose_transition(traffic_points, best_score, temperature):
+            #if traffic_points > best_score:
+                print tour
+                print "new best score:", traffic_points
+                print "temperature:", temperature
+                #debug code
+                if traffic_points == 0:
+                    print tour
+                    print m
+                    quit()
+                best_score = traffic_points
+                best_traffic = traffic
+                best_passengers = self.passengers
+                best_current_time = self.currentTime
+                prev_tour = tour
+            self.passengers = copy.deepcopy(self.PASSENGERS)
+            self.currentTime = 0.0
+
+            temperature *= 0.999
 
 
         self.passengers = best_passengers
