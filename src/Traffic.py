@@ -87,7 +87,7 @@ class Traffic(object):
                         prev_flight.setRefuel()
                         traffic[i].distanceCovered = 0 # fill the tank of plane 
 
-                    passengers =  min(self.PASSENGERS[prev_city.getIndex()][j], 199)
+                    passengers =  min(self.PASSENGERS[prev_city.getIndex()][j], Airplane.MAX_PASSENGERS)
 
                     flight = Flight(passengers,
                             self.currentTime, 
