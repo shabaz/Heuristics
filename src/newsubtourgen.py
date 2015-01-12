@@ -1,4 +1,5 @@
 import random
+import copy
 
 DISTANCES = [[0,2164,1239,577,1789,1146,621,756,711,1501,2212,1768,1864,357,1481,1974,1515,2148,669,912,430,2014,1297,1744,1125,1458,936,1094],
              [2164,0,1877,1803,745,1125,2137,2855,2874,2469,563,1446,2851,2391,2368,860,1795,2232,1496,2606,2095,4160,1051,526,2408,2387,1283,1598],
@@ -105,6 +106,7 @@ def find_valid_tour_extensions(tour):
 
 
 def gen_tour(tour=[0]):
+    initial_tour = copy.copy(tour)
     time_so_far = -60
     prev_node = tour[0]
     for i in tour[1:]:
@@ -140,8 +142,12 @@ def gen_tour(tour=[0]):
         return tour[:-1]
     else:
         extensions = None
+        removals = 0
         while not extensions:
             tour = tour[:-1]
+            removals += 1
+            if removals > 2:
+                return gen_tour(initial_tour)
             extensions = find_valid_tour_extensions(tour)
             extensions = [i for i in extensions if i]
         extended =  tour + random.choice(extensions)
@@ -172,20 +178,23 @@ def permutate_tour(tour):
         end = random.randrange(start+1,len(tour))
     shifted_tour = tour[end:] + tour[:start]
     extended_tour = gen_tour(shifted_tour)
+
+    while extended_tour[-1] == extended_tour[0]:
+        extended_tour = extended_tour[:-1]
     end_size = len(tour[end:])
     extended_tour = extended_tour[end_size:] + extended_tour[:end_size]
     return extended_tour
 
-tour = gen_tour()
-print tour
+#tour = gen_tour()
+#print tour
 
 
 
-for i in xrange(15):
-    tour = permutate_tour(tour)
-    print tour
-    if not check_valid_tour(tour):
-        print "non valid tour"
+#for i in xrange(15000):
+#    tour = permutate_tour(tour)
+#    print tour
+#    if not check_valid_tour(tour):
+#        print "non valid tour"
 
 
 

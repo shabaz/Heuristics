@@ -1,5 +1,5 @@
 from DistanceMap import DistanceMap
-from TrafficFrame import TrafficFrame
+#from TrafficFrame import TrafficFrame
 from Airplane import Airplane
 from Flight import Flight
 from random import randint, randrange, random
@@ -15,9 +15,11 @@ def choose_transition(new_points, prev_points, temperature):
     if new_points > prev_points:
         return True
     else:
-        new_points = 1.0/(new_points+1)
-        prev_points = 1.0/(prev_points+1)
-        transition_probability = math.exp((prev_points - new_points)/temperature)
+        #new_points = 1.0/(new_points+1)
+        #prev_points = 1.0/(prev_points+1)
+        new_points /= 50
+        prev_points /= 50
+        transition_probability = math.exp((new_points - prev_points)/temperature)
         return random.random() < transition_probability
         
 
@@ -61,9 +63,9 @@ class Traffic(object):
         self.distanceMap = DistanceMap()
         self.cities = self.distanceMap.getCities()
         self.traffic = self.setAirplanes()
-        self.frame = TrafficFrame(self.traffic)
-        self.frame.setCities(self.cities)
-        self.frame.setTraffic()
+        #self.frame = TrafficFrame(self.traffic)
+        #self.frame.setCities(self.cities)
+        #self.frame.setTraffic()
         
     def setAirplanes(self):
         #an example of a flight plan
@@ -75,10 +77,12 @@ class Traffic(object):
         best_passengers = None
         best_current_time = None
         prev_tour = None
+
+        f = open("score_over_time.dat", "w")
         
-        temperature = 30
+        temperature = 50000
        
-        for m in xrange(1000):
+        for m in xrange(10000):
 
             traffic = [0 for x in range(self.NUMBER_OF_AIRPLANES)]
             for i in range(len(traffic)):
@@ -90,6 +94,7 @@ class Traffic(object):
                     tour = permutate_tour(prev_tour)
                 #tour = [0, 25, 20, 6, 27, 16, 11]
                 #tour = [0, 26, 14, 22, 13, 24]
+                #tour = [0, 1, 15, 25, 21]
 
                 prev_city = self.cities[tour[0]]
                 prev_flight = None
@@ -139,11 +144,14 @@ class Traffic(object):
             self.passengers = copy.deepcopy(self.PASSENGERS)
             self.currentTime = 0.0
 
+            f.write(str(m) + " " + str(best_score) + "\n")
+
             temperature *= 0.999
 
 
         self.passengers = best_passengers
         self.currentTime = best_current_time
+        f.close()
         return best_traffic
     
     def updatePassengerTable(self, city1, city2, numberOfPassengers):
