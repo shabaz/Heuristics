@@ -47,6 +47,9 @@ def check_valid_tour(tour):
         naive_time_refueling += next_distance / 3199.0 * 60.0
         prev_node = i
 
+    if time_in_air + naive_time_refueling + time_docking > 1200:
+        return False
+
     min_refuelings = 1000
     for shift in xrange(len(tour)):
         expanded_tour = tour[shift:] + tour[:shift] + [tour[shift]]
