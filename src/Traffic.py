@@ -1,5 +1,5 @@
 from DistanceMap import DistanceMap
-#from TrafficFrame import TrafficFrame
+from TrafficFrame import TrafficFrame
 from Airplane import Airplane
 from Flight import Flight
 from random import randint, randrange, random
@@ -63,9 +63,9 @@ class Traffic(object):
         self.distanceMap = DistanceMap()
         self.cities = self.distanceMap.getCities()
         self.traffic = self.setAirplanes()
-        #self.frame = TrafficFrame(self.traffic)
-        #self.frame.setCities(self.cities)
-        #self.frame.setTraffic()
+        self.frame = TrafficFrame(self.traffic)
+        self.frame.setCities(self.cities)
+        self.frame.setTraffic()
         
     def setAirplanes(self):
         #an example of a flight plan
@@ -82,7 +82,7 @@ class Traffic(object):
         
         temperature = 50000
        
-        for m in xrange(10000):
+        for m in xrange(20000):
 
             traffic = [0 for x in range(self.NUMBER_OF_AIRPLANES)]
 
