@@ -39,12 +39,35 @@ def naive_time_tour(tour):
     time_in_air = 0
     naive_time_tanking = -60
     prev_node = tour[0]
+    invalid = False
     for i in tour[1:]:
         distance = DISTANCES[prev_node][i]
+        if distance > 3199:
+            invalid = True
         time_in_air += distance/800.0 * 60.0
         naive_time_tanking += distance/3199.0 * 60
         prev_node = i
-    return time_in_air, time_docking, naive_time_tanking
+    return time_in_air, time_docking, naive_time_tanking, invalid
+
+def find_start_city(tour):
+    min_refuelings = float('inf')
+    optimal_shift = 0
+    for shift in xrange(len(tour)):
+        expanded_tour = tour[shift:] + tour[:shift] + [tour[shift]]
+        tank = 3199
+        prev_node = expanded_tour[0]
+        refuelings = 0
+        for i in expanded_tour[1:]:
+            next_distance = DISTANCES[prev_node][i]
+            prev_node = i
+            if tank < next_distance:
+                tank = 3199
+                refuelings += 1
+            tank -= next_distance
+        if refuelings < min_refuelings:
+            min_refuelings = refuelings
+            optimal_shift = shift
+    return optimal_shift
 
 def find_minimum_refeulings(tour):
     min_refuelings = float('inf')
@@ -66,8 +89,8 @@ def find_minimum_refeulings(tour):
 
 def check_valid_tour(tour):
     expanded_tour = tour + [tour[0]]
-    time_in_air, time_docking, naive_time_refueling = naive_time_tour(expanded_tour)
-    if time_in_air + naive_time_refueling + time_docking > 1200:
+    time_in_air, time_docking, naive_time_refueling, invalid = naive_time_tour(expanded_tour)
+    if invalid or time_in_air + naive_time_refueling + time_docking > 1200:
         return False
     min_refuelings = find_minimum_refeulings(tour)
     total_time = time_in_air + time_docking + min_refuelings * 60
@@ -110,7 +133,7 @@ def find_extension_tree(tour, time_so_far):
     return valid_extensions
 
 def find_valid_tour_extensions(tour):
-    time_in_air, time_docking, naive_time_tanking = naive_time_tour(tour)
+    time_in_air, time_docking, naive_time_tanking, invalid= naive_time_tour(tour)
     time_so_far = time_in_air + time_docking + naive_time_tanking
 
     return find_extension_tree(tour, time_so_far)
@@ -121,7 +144,7 @@ def gen_tour(tour=None):
         tour = [0]
     initial_tour = copy.copy(tour)
 
-    time_in_air, time_docking, naive_time_tanking = naive_time_tour(tour)
+    time_in_air, time_docking, naive_time_tanking, invalid = naive_time_tour(tour)
     time_so_far = time_in_air + time_docking + naive_time_tanking
 
     while True:

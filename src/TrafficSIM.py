@@ -104,11 +104,14 @@ class Traffic(object):
 
                 for i in range(len(traffic)):
                     tour = tours[i]
-                    traffic[i] = Airplane(i, self.cities[0], self.cities[0], self.COLOR[i])
+                    shift = find_start_city(tour)
+                    shifted_tour = tour[shift:] + tour[:shift]
 
-                    prev_city = self.cities[tour[0]]
+                    traffic[i] = Airplane(i, self.cities[0], self.cities[shifted_tour[0]], self.COLOR[i])
+
+                    prev_city = self.cities[shifted_tour[0]]
                     prev_flight = None
-                    for j in tour[1:]+[tour[0]]:
+                    for j in shifted_tour[1:]+[shifted_tour[0]]:
                         next_city = self.cities[j]
 
                         flight_distance = prev_city.getDistanceTo(next_city.getIndex())
@@ -127,7 +130,8 @@ class Traffic(object):
                                 False)
                         self.updatePassengerTable(prev_city, next_city, passengers)
                         self.currentTime += flight.getTotalTimeFlight()
-                        traffic[i].addFlight(flight)
+                        if not traffic[i].addFlight(flight):
+                            print tour
                         prev_city = next_city
                         prev_flight = flight
                         #print "traffic point", traffic[i].getAirplanePoints()
@@ -136,8 +140,8 @@ class Traffic(object):
                 for airplane in traffic:
                     traffic_points += airplane.getAirplanePoints()
 
-                if choose_transition(traffic_points, best_score[k], temperature):
-                #if traffic_points > best_score:
+                #if choose_transition(traffic_points, best_score[k], temperature):
+                if traffic_points > best_score[k]:
                     if totalCounter%100 == 0: pass
                         #print "Iterations: ", totalCounter
                         #print "New best score: ", traffic_points
