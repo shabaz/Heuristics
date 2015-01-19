@@ -60,6 +60,7 @@ class Traffic(object):
     
     def __init__(self):
         self.currentTime = 0.0
+        self.simNum = 100
         self.passengers = copy.deepcopy(self.PASSENGERS)
         self.distanceMap = DistanceMap()
         self.cities = self.distanceMap.getCities()
@@ -72,101 +73,111 @@ class Traffic(object):
         #an example of a flight plan
         #try to change values to create a frame
 
+        best_score = [0 for i in range(self.simNum)]
 
-        best_traffic = None
-        best_score = 0
-        best_passengers = None
-        best_current_time = None
-        prev_tours = None
+        for k in range(self.simNum):
+            print("Simulation number %d" %k)
+            best_traffic = None
+            best_passengers = None
+            best_current_time = None
+            prev_tours = None
 
-        f = open("score_over_time.dat", "w")
-        
-        temperature = 10000
-        totalCounter = 0
-        counter = 0
-       
-        while counter<1000:
+            #f = open("score_over_time.dat", "w")
+            
+            temperature = 10000
+            totalCounter = 0
+            counter = 0 
 
-            traffic = [0 for x in range(self.NUMBER_OF_AIRPLANES)]
+            while counter<100:
 
-            if not prev_tours:
-                tours = []
-                for i in xrange(self.NUMBER_OF_AIRPLANES):
-                    tours.append(gen_tour())
-                
-            else:
-                changing_flight = random.randrange(0,self.NUMBER_OF_AIRPLANES)
-                tours = copy.deepcopy(prev_tours)
-                tours[changing_flight] = permutate_tour(tours[changing_flight])
+                traffic = [0 for x in range(self.NUMBER_OF_AIRPLANES)]
 
-            for i in range(len(traffic)):
-                tour = tours[i]
-                traffic[i] = Airplane(i, self.cities[0], self.cities[0], self.COLOR[i])
+                if not prev_tours:
+                    tours = []
+                    for i in xrange(self.NUMBER_OF_AIRPLANES):
+                        tours.append(gen_tour())
+                    
+                else:
+                    changing_flight = random.randrange(0,self.NUMBER_OF_AIRPLANES)
+                    tours = copy.deepcopy(prev_tours)
+                    tours[changing_flight] = permutate_tour(tours[changing_flight])
 
-                #tour = [0, 25, 20, 6, 27, 16, 11]
-                #tour = [0, 26, 14, 22, 13, 24]
-                #tour = [0, 1, 15, 25, 21]
+                for i in range(len(traffic)):
+                    tour = tours[i]
+                    traffic[i] = Airplane(i, self.cities[0], self.cities[0], self.COLOR[i])
 
-                prev_city = self.cities[tour[0]]
-                prev_flight = None
-                for j in tour[1:]+[tour[0]]:
-                    next_city = self.cities[j]
+                    prev_city = self.cities[tour[0]]
+                    prev_flight = None
+                    for j in tour[1:]+[tour[0]]:
+                        next_city = self.cities[j]
 
-                    flight_distance = prev_city.getDistanceTo(next_city.getIndex())
-                    if flight_distance + traffic[i].distanceCovered >= Airplane.MAX_DISTANCE:
-                        prev_flight.setRefuel()
-                        traffic[i].distanceCovered = 0 # fill the tank of plane 
+                        flight_distance = prev_city.getDistanceTo(next_city.getIndex())
+                        if flight_distance + traffic[i].distanceCovered >= Airplane.MAX_DISTANCE:
+                            prev_flight.setRefuel()
+                            traffic[i].distanceCovered = 0 # fill the tank of plane 
 
-                    passengers =  min(self.passengers[prev_city.getIndex()][j], 199)
+                        passengers =  min(self.passengers[prev_city.getIndex()][j], 199)
 
-                    flight = Flight(passengers,
-                            self.currentTime, 
-                            prev_city, 
-                            (float(prev_city.getDistanceTo(next_city.getIndex())) / traffic[i].getAirplaneSpeed() * 60) + self.currentTime, 
-                            next_city, 
-                            prev_city.getDistanceTo(next_city.getIndex()), 
-                            False)
-                    self.updatePassengerTable(prev_city, next_city, passengers)
-                    self.currentTime += flight.getTotalTimeFlight()
-                    traffic[i].addFlight(flight)
-                    prev_city = next_city
-                    prev_flight = flight
-                    #print "traffic point", traffic[i].getAirplanePoints()
+                        flight = Flight(passengers,
+                                self.currentTime, 
+                                prev_city, 
+                                (float(prev_city.getDistanceTo(next_city.getIndex())) / traffic[i].getAirplaneSpeed() * 60) + self.currentTime, 
+                                next_city, 
+                                prev_city.getDistanceTo(next_city.getIndex()), 
+                                False)
+                        self.updatePassengerTable(prev_city, next_city, passengers)
+                        self.currentTime += flight.getTotalTimeFlight()
+                        traffic[i].addFlight(flight)
+                        prev_city = next_city
+                        prev_flight = flight
+                        #print "traffic point", traffic[i].getAirplanePoints()
 
-            traffic_points = 0
-            for airplane in traffic:
-                traffic_points += airplane.getAirplanePoints()
+                traffic_points = 0
+                for airplane in traffic:
+                    traffic_points += airplane.getAirplanePoints()
 
-            if choose_transition(traffic_points, best_score, temperature):
-            #if traffic_points > best_score:
-                if totalCounter%100 == 0:
-                    print "Iterations: ", totalCounter
-                    print "New best score: ", traffic_points
-                    print "Temperature: ", temperature
-                #debug code
-                if traffic_points == 0:
-                    print tour
-                    quit()
-                best_score = traffic_points
-                best_traffic = traffic
-                best_passengers = self.passengers
-                best_current_time = self.currentTime
-                prev_tours = tours
-                counter = 0
-            else:
-                counter += 1
-            totalCounter += 1
-            self.passengers = copy.deepcopy(self.PASSENGERS)
-            self.currentTime = 0.0
+                if choose_transition(traffic_points, best_score[k], temperature):
+                #if traffic_points > best_score:
+                    if totalCounter%100 == 0: pass
+                        #print "Iterations: ", totalCounter
+                        #print "New best score: ", traffic_points
+                        #print "Temperature: ", temperature
+                    #debug code
+                    if traffic_points == 0:
+                        print tour
+                        quit()
+                    best_score[k] = traffic_points
+                    best_traffic = traffic
+                    best_passengers = self.passengers
+                    best_current_time = self.currentTime
+                    prev_tours = tours
+                    counter = 0
+                else:
+                    counter += 1
+                totalCounter += 1
+                self.passengers = copy.deepcopy(self.PASSENGERS)
+                self.currentTime = 0.0
 
-            f.write(str(totalCounter) + " " + str(best_score) + "\n")
+                #f.write(str(totalCounter) + " " + str(best_score) + "\n")
 
-            temperature *= 0.999
+                temperature *= 0.999
 
 
-        self.passengers = best_passengers
-        self.currentTime = best_current_time
-        f.close()
+            self.passengers = best_passengers
+            self.currentTime = best_current_time
+            #f.close()
+
+        SampleVariance = 0.0
+
+        bestScore = max(best_score)
+        averageScore = int(round(sum(best_score)/self.simNum))
+
+        for i in range(0,self.simNum):
+            SampleVariance = SampleVariance + (best_score[i]-averageScore)**2/(self.simNum-1)
+
+        print "Beste van %d runs is: %d" %(self.simNum,bestScore)
+        print "Gemiddelde van %d runs is: %d" %(self.simNum,averageScore)
+        print "Standaard afwijking van %d runs is: %s" %(self.simNum,(SampleVariance)**0.5)
         return best_traffic
     
     def updatePassengerTable(self, city1, city2, numberOfPassengers):
