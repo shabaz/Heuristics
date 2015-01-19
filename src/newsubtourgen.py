@@ -176,20 +176,3 @@ def permutate_tour(tour):
     extended_tour = extended_tour[end_size:] + extended_tour[:end_size]
     return extended_tour
     
-
-x = gen_tour()
-
-for i in xrange(10000):
-    if i % 10 == 0:
-        print i
-    x = permutate_tour(x)
-
-    prev_node = x[0]
-    if x[0] == x[-1]:
-        print "start end", x
-        quit()
-    for i in x[1:]:
-        if i == prev_node:
-            print "middle", x
-            quit()
-        prev_node = i
