@@ -81,8 +81,10 @@ class Traffic(object):
         f = open("score_over_time.dat", "w")
         
         temperature = 50000
+        totalCounter = 0
+        counter = 0
        
-        for m in xrange(20000):
+        while counter<1000:
 
             traffic = [0 for x in range(self.NUMBER_OF_AIRPLANES)]
 
@@ -136,23 +138,27 @@ class Traffic(object):
 
             if choose_transition(traffic_points, best_score, temperature):
             #if traffic_points > best_score:
-                print tours
-                print "new best score:", traffic_points
-                print "temperature:", temperature
+                if totalCounter%100 == 0:
+                    print "Iterations: ", totalCounter
+                    print "New best score: ", traffic_points
+                    print "Temperature: ", temperature
                 #debug code
                 if traffic_points == 0:
                     print tour
-                    print m
                     quit()
                 best_score = traffic_points
                 best_traffic = traffic
                 best_passengers = self.passengers
                 best_current_time = self.currentTime
                 prev_tours = tours
+                counter = 0
+            else:
+                counter += 1
+            totalCounter += 1
             self.passengers = copy.deepcopy(self.PASSENGERS)
             self.currentTime = 0.0
 
-            f.write(str(m) + " " + str(best_score) + "\n")
+            f.write(str(totalCounter) + " " + str(best_score) + "\n")
 
             temperature *= 0.999
 
