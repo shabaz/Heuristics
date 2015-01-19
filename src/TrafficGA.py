@@ -59,9 +59,9 @@ class Traffic(object):
     
     def __init__(self):
         self.currentTime = 0.0
-        self.initialPopSize = 10
-        self.parentsFraction = 0.8
-        self.childrenFraction = 1    
+        self.initialPopSize = 1000
+        self.parentsFraction = 0.95
+        self.childrenFraction = 1
         self.passengers = copy.deepcopy(self.PASSENGERS)
         self.distanceMap = DistanceMap()
         self.cities = self.distanceMap.getCities()
@@ -85,14 +85,15 @@ class Traffic(object):
         tours = []
 
         for i in range(0,self.initialPopSize):
-            tours.append(create_subtour([0],[0]))
+            tours.append(gen_tour([0]))
 
         population = self.initialPopSize
 
-        while population>1:
+        while True:
 
             numberOfParents = int(self.parentsFraction*population)
             numberOfChildren = int(self.childrenFraction*numberOfParents)
+            traffic_points = [0 for i in range(0,population)]
 
             for i in range(0,population):
                 tour = tours[i]
@@ -122,11 +123,12 @@ class Traffic(object):
                     traffic[i].addFlight(flight)
                     prev_city = next_city
                     prev_flight = flight
-
-            traffic_points = [0 for i in range(0,population)]
-            for i in range(0,population):
                 traffic_points[i] += traffic[i].getAirplanePoints()
 
+            if population==1:
+                print(tour)
+                print(traffic_points)
+                break
 
             parentsLeft = numberOfParents
             choosingParents = True
@@ -149,22 +151,32 @@ class Traffic(object):
             children = []
 
             while makeChildren:
+                """
                 x = random.randrange(0,numberOfParents)
                 y = random.randrange(0,numberOfParents)
                 parent1 = parents[x]
                 parent2 = parents[y]
 
-                children.append(create_subtour(parent1[:-3],parent1[3:]))
+                children.append(create_subtour(parent1[:-3],parent2[3:]))
+                """
+
+                x = random.randrange(0,numberOfParents)
+
+                parent = parents[x]
+                parent = permutate_tour(parent)
+                children.append(permutate_tour(parent))
 
                 childrenLeft -= 1
                 if childrenLeft == 0:
                     makeChildren = False
 
+
+            self.passengers = copy.deepcopy(self.PASSENGERS)
+            self.currentTime = 0.0
             tours = []
             tours = copy.deepcopy(children)
             population = numberOfChildren
-
-            print(children)
+            print(population)
 
 
     def updatePassengerTable(self, city1, city2, numberOfPassengers):

@@ -78,6 +78,6 @@ class Airplane(object):
         if(distance < (self.MAX_DISTANCE - self.distanceCovered)):
             if(flightTime < (self.MINUTES_PER_DAY - time)):
                return True
-            else: print "Cannot fly to", city.getName(), ", will not arrive before 02:00."
+            #else: print "Cannot fly to", city.getName(), ", will not arrive before 02:00."
         else: print "Cannot fly to", city.getName(), ", needs refueling in", self.currentCity.getName()
         return False

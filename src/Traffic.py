@@ -5,6 +5,7 @@ from Flight import Flight
 from random import randint, randrange, random
 import math
 import copy
+import datetime
 
 from createSubtour import create_subtour
 from newsubtourgen import *
@@ -80,7 +81,7 @@ class Traffic(object):
 
         f = open("score_over_time.dat", "w")
         
-        temperature = 50000
+        temperature = 10000
         totalCounter = 0
         counter = 0
        
@@ -174,5 +175,7 @@ class Traffic(object):
             quit()
         else: self.passengers[city1.getIndex()][city2.getIndex()] -= numberOfPassengers
         
-
+a = datetime.datetime.now()
 Traffic()
+b = datetime.datetime.now()
+print('Elapsed time: %s' %(b-a))
