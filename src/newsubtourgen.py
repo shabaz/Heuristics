@@ -34,23 +34,20 @@ DISTANCES = [[0,2164,1239,577,1789,1146,621,756,711,1501,2212,1768,1864,357,1481
 maxtime = 20 * 60
 
 
-
-def check_valid_tour(tour):
-    prev_node = tour[0]
-    expanded_tour = tour + [tour[0]]
+def naive_time_tour(tour):
+    time_docking = (len(tour)-1)*60
     time_in_air = 0
-    time_docking = (len(tour)-1) * 60
-    naive_time_refueling = -60
-    for i in expanded_tour[1:]:
-        next_distance = DISTANCES[prev_node][i]
-        time_in_air += next_distance / 800.0 * 60.0
-        naive_time_refueling += next_distance / 3199.0 * 60.0
+    naive_time_tanking = -60
+    prev_node = tour[0]
+    for i in tour[1:]:
+        distance = DISTANCES[prev_node][i]
+        time_in_air += distance/800.0 * 60.0
+        naive_time_tanking += distance/3199.0 * 60
         prev_node = i
+    return time_in_air, time_docking, naive_time_tanking
 
-    if time_in_air + naive_time_refueling + time_docking > 1200:
-        return False
-
-    min_refuelings = 1000
+def find_minimum_refeulings(tour):
+    min_refuelings = float('inf')
     for shift in xrange(len(tour)):
         expanded_tour = tour[shift:] + tour[:shift] + [tour[shift]]
         tank = 3199
@@ -65,62 +62,69 @@ def check_valid_tour(tour):
             tank -= next_distance
         if refuelings < min_refuelings:
             min_refuelings = refuelings
+    return min_refuelings
+
+def check_valid_tour(tour):
+    expanded_tour = tour + [tour[0]]
+    time_in_air, time_docking, naive_time_refueling = naive_time_tour(expanded_tour)
+    if time_in_air + naive_time_refueling + time_docking > 1200:
+        return False
+    min_refuelings = find_minimum_refeulings(tour)
     total_time = time_in_air + time_docking + min_refuelings * 60
-    #print min_refuelings * 60, naive_time_refueling
     return total_time <= 20 * 60
 
 
-def find_valid_tour_extensions(tour):
-    time_docking = (len(tour)-1)*60
-    time_in_air = 0
-    naive_time_tanking = -60
-    prev_node = tour[0]
-    for i in tour[1:]:
-        distance = DISTANCES[prev_node][i]
-        time_in_air += distance/800.0 * 60.0
-        naive_time_tanking += distance/3199.0 * 60
-        prev_node = i
-    time_so_far = time_in_air + time_docking + naive_time_tanking
+def find_extension_tree(tour, time_so_far):
     valid_extensions = []
+
+    #check if the current tour is already valid
+    if tour[-1] != tour[0] and check_valid_tour(tour):
+        valid_extensions.append([])
+
+    #check if any of the 28 cities can be added
     for i in xrange(28):
         distance = DISTANCES[tour[-1]][i]
+
+        #city is disqualified if it is equal to the current last city in tour
+        #or has a distance that cannot be flown even on a full tank
         if i == tour[-1] or distance > 3199:
             continue
+
+        #calculated extra time needed for the next flight, with naive time
+        #measure for refueling
         addition_time_in_air = distance/800.0 * 60
         additional_time_refeuling = distance/3199.0 * 60.0
         extra_time = addition_time_in_air + additional_time_refeuling + 60
         if time_so_far + extra_time > 1200:
             continue
-        extensions = find_valid_tour_extensions(tour+[i])
-        if not extensions:
-            extension = [i]
-            if tour[0] in extension and check_valid_tour(tour+extension):
-                valid_extensions.append(extension)
+
+        extensions = find_extension_tree(tour+[i], time_so_far + extra_time)
         for extension in extensions:
+            if extension and extension == tour[:1]:
+                print extension
+                continue
             full_extension = [i] + extension
-            if tour[0] in full_extension and check_valid_tour(tour+full_extension):
-                last_removed = None
-                while last_removed != tour[0]:
-                    last_removed = full_extension[-1]
-                    full_extension = full_extension[:-1]
+
+            if check_valid_tour(tour+full_extension):
                 valid_extensions.append(full_extension)
     return valid_extensions
 
+def find_valid_tour_extensions(tour):
+    time_in_air, time_docking, naive_time_tanking = naive_time_tour(tour)
+    time_so_far = time_in_air + time_docking + naive_time_tanking
+
+    return find_extension_tree(tour, time_so_far)
 
 
-def gen_tour(tour=[0]):
+def gen_tour(tour=None):
+    if not tour:
+        tour = [0]
     initial_tour = copy.copy(tour)
-    time_so_far = -60
-    prev_node = tour[0]
-    for i in tour[1:]:
-        distance = DISTANCES[prev_node][i]
-        time_in_air = distance/800.0 * 60.0
-        naive_time_tanking = distance/3199.0 * 60
-        time_so_far += time_in_air + naive_time_tanking + 60
-        prev_node = i
 
-    adding = True
-    while adding:
+    time_in_air, time_docking, naive_time_tanking = naive_time_tour(tour)
+    time_so_far = time_in_air + time_docking + naive_time_tanking
+
+    while True:
         child_candidates = []
         time_left = maxtime - time_so_far
         for child in xrange(28):
@@ -133,14 +137,15 @@ def gen_tour(tour=[0]):
                 continue
             child_candidates.append(child)
         if not child_candidates:
-            adding = False
-        else:
-            next_child = random.choice(child_candidates)
-            child_distance = DISTANCES[tour[-1]][next_child]
-            tour.append(next_child)
-            time_in_air = child_distance/800.0 * 60
-            time_fueling = child_distance / 3199.0 * 60
-            time_so_far += time_in_air + time_fueling + 60
+            break
+
+        next_child = random.choice(child_candidates)
+        child_distance = DISTANCES[tour[-1]][next_child]
+        tour.append(next_child)
+        time_in_air = child_distance/800.0 * 60
+        time_fueling = child_distance / 3199.0 * 60
+        time_so_far += time_in_air + time_fueling + 60
+
     if tour[0] == tour[-1] and check_valid_tour(tour[:-1]):
         return tour[:-1]
     else:
@@ -152,26 +157,9 @@ def gen_tour(tour=[0]):
             if removals > 2:
                 return gen_tour(initial_tour)
             extensions = find_valid_tour_extensions(tour)
-            extensions = [i for i in extensions if i]
         extended =  tour + random.choice(extensions)
         return extended
 
-
-
-
-
-
-
-#valid_tours = []
-#actual_valid_tours = []
-#for i in xrange(1000):
-#    tour = gen_tour()
-#    if tour:
-#        valid_tours.append(tour)
-#        if check_valid_tour(tour):
-#            actual_valid_tours.append(tour)
-#print len(valid_tours)
-#print len(actual_valid_tours)
 
 def permutate_tour(tour):
     start = random.randrange(1,len(tour))
@@ -187,40 +175,21 @@ def permutate_tour(tour):
     end_size = len(tour[end:])
     extended_tour = extended_tour[end_size:] + extended_tour[:end_size]
     return extended_tour
+    
 
-#tour = gen_tour()
-#print tour
+x = gen_tour()
 
+for i in xrange(10000):
+    if i % 10 == 0:
+        print i
+    x = permutate_tour(x)
 
-
-#for i in xrange(15000):
-#    tour = permutate_tour(tour)
-#    print tour
-#    if not check_valid_tour(tour):
-#        print "non valid tour"
-
-
-
-
-#    extensions = find_valid_tour_extensions(tour)
-#    if not extensions:
-#        if not check_valid_tour(tour):
-#            print "OOOOOOPPPPS"
-#        else:
-#            extended_tour = shifted_tour
-#    else:
-#        extended_tour = shifted_tour + random.choice(find_valid_tour_extensions(tour))
-#    end_size = len(tour[end:])
-#    extended_tour = extended_tour[end_size:] + extended_tour[:end_size]
-#    print extended_tour
-#    while extended_tour[-1] == extended_tour[0]:
-#        extended_tour = extended_tour[:-1]
-#    if not check_valid_tour(extended_tour):
-#        print "XXXXXXXXXXXXXXXXX"
-#        print "XXXXXXXXXXXXXXXXX"
-#        print "XXXXXXXXXXXXXXXXX"
-#        print "XXXXXXXXXXXXXXXXX"
-#        print "XXXXXXXXXXXXXXXXX"
-#        quit()
-
-
+    prev_node = x[0]
+    if x[0] == x[-1]:
+        print "start end", x
+        quit()
+    for i in x[1:]:
+        if i == prev_node:
+            print "middle", x
+            quit()
+        prev_node = i
