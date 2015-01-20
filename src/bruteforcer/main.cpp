@@ -119,24 +119,14 @@ int calculate_cost(std::vector<int>& route)
 
 
     int cost = 0;
-    int prev = -1;
+    int prev = route.back();
     for (auto i: route)
     {
-        int distance=0;
-        int passengers=0;
-        if (prev == -1) {
-            distance = DISTANCES[route.back()][route[0]];
-            int passengers = PASSENGERS[route.back()][route[0]];
-            if (passengers > 199)
-                passengers = 199;
-            PASSENGERS[route.back()][route[0]] -= passengers;
-        } else {
-            distance = DISTANCES[prev][i];
-            passengers = PASSENGERS[prev][i];
-            if (passengers > 199)
-                passengers = 199;
-            PASSENGERS[prev][i] -= passengers;
-        }
+        int distance = DISTANCES[prev][i];
+        int passengers = PASSENGERS[prev][i];
+        if (passengers > 199)
+            passengers = 199;
+        PASSENGERS[prev][i] -= passengers;
         cost += passengers * distance;
         prev = i;
     }
@@ -158,7 +148,7 @@ void check_tree(std::vector<int>& route, float time_so_far, int depth)
     }
 
     checked++;
-    if (check_valid_route(route)) {
+    if (route[0] != route.back() && check_valid_route(route)) {
         int cost = calculate_cost(route);
         if (cost > best_cost) {
             best_cost = cost;
