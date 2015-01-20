@@ -36,17 +36,18 @@ maxtime = 20 * 60
 
 def naive_time_tour(tour):
     time_docking = (len(tour)-1)*60
-    time_in_air = 0
-    naive_time_tanking = -60
     prev_node = tour[0]
     invalid = False
+    distance_in_air = 0
     for i in tour[1:]:
         distance = DISTANCES[prev_node][i]
         if distance > 3199:
             invalid = True
-        time_in_air += distance/800.0 * 60.0
-        naive_time_tanking += distance/3199.0 * 60
+        distance_in_air += distance
+        print distance_in_air
         prev_node = i
+    time_in_air = distance_in_air/800.0 * 60.0
+    naive_time_tanking = -60 + distance_in_air/3199.0 * 60.0
     return time_in_air, time_docking, naive_time_tanking, invalid
 
 def find_start_city(tour):
