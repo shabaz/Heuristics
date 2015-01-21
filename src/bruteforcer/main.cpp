@@ -176,8 +176,7 @@ void check_tree(std::vector<int>& route, float time_so_far, float cost_so_far, i
     }
 
     float time_left = 1200 - time_so_far;
-    float time_in_air = time_left / 1.25;
-    float km_in_air = time_in_air / 60.0 * 800.0;
+    float km_in_air = time_left / 60.0 * 800.0;
     float max_potential_extra_cost = km_in_air * 199;
     if (cost_so_far + max_potential_extra_cost < best_cost)
         return;
