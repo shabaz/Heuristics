@@ -105,7 +105,7 @@ bool check_valid_route(std::vector<int>& route)
 
     float time_in_air = distance_in_air / 800.0 * 60.0;
     float naive_time_tanking = -60 + distance_in_air / 3199.0 * 60;
-    int time_docking = route.size() * 60;
+    int time_docking = (route.size()-1) * 60;
     if (time_in_air + naive_time_tanking + time_docking > 1200) {
         return false;
     }

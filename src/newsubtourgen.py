@@ -35,7 +35,7 @@ maxtime = 20 * 60
 
 
 def naive_time_tour(tour):
-    time_docking = (len(tour)-1)*60
+    time_docking = (len(tour)-2)*60
     prev_node = tour[0]
     invalid = False
     distance_in_air = 0
@@ -44,7 +44,6 @@ def naive_time_tour(tour):
         if distance > 3199:
             invalid = True
         distance_in_air += distance
-        print distance_in_air
         prev_node = i
     time_in_air = distance_in_air/800.0 * 60.0
     naive_time_tanking = -60 + distance_in_air/3199.0 * 60.0
