@@ -84,11 +84,13 @@ class Traffic(object):
 
             #f = open("score_over_time.dat", "w")
             
-            temperature = 10000
+            temperature = 25000
             totalCounter = 0
             counter = 0 
 
-            while counter<100:
+            a = datetime.datetime.now()
+
+            while counter<2000:
 
                 traffic = [0 for x in range(self.NUMBER_OF_AIRPLANES)]
 
@@ -130,8 +132,8 @@ class Traffic(object):
                                 False)
                         self.updatePassengerTable(prev_city, next_city, passengers)
                         self.currentTime += flight.getTotalTimeFlight()
-                        if not traffic[i].addFlight(flight):
-                            print tour
+                        if not traffic[i].addFlight(flight): pass
+                            #print tour
                         prev_city = next_city
                         prev_flight = flight
                         #print "traffic point", traffic[i].getAirplanePoints()
@@ -146,10 +148,6 @@ class Traffic(object):
                         #print "Iterations: ", totalCounter
                         #print "New best score: ", traffic_points
                         #print "Temperature: ", temperature
-                    #debug code
-                    if traffic_points == 0:
-                        print tour
-                        quit()
                     best_score[k] = traffic_points
                     best_traffic = traffic
                     best_passengers = self.passengers
@@ -166,6 +164,12 @@ class Traffic(object):
 
                 temperature *= 0.999
 
+            b = datetime.datetime.now()
+
+            print "Iterations: ", totalCounter
+            print "New best score: ", best_score[k]
+            print "Temperature: ", temperature
+            print "Time: %s\n" %((b-a))
 
             self.passengers = best_passengers
             self.currentTime = best_current_time
