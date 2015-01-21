@@ -71,7 +71,7 @@ int find_minimum_refuelings(std::vector<int>& tour)
         int current_index = shift;
         do {
             int next_index = (current_index + 1) % tour_size;
-            int distance = DISTANCES[current_index][next_index];
+            int distance = DISTANCES[tour[current_index]][tour[next_index]];
             if (tank < distance) {
                 tank = 3199;
                 refuelings++;
@@ -86,17 +86,13 @@ int find_minimum_refuelings(std::vector<int>& tour)
 }
 
 
+
 bool check_valid_route(std::vector<int>& route)
 {
-    int prev = -1;
+    int prev = route.back();
     int distance_in_air = 0;
     for (auto i: route) {
-        int distance;
-        if (prev == -1) {
-            distance = DISTANCES[route.back()][route[0]];
-        } else {
-            distance = DISTANCES[prev][i];
-        }
+        int distance = DISTANCES[prev][i];
         prev = i;
         if (distance > 3199)
             return false;
@@ -187,12 +183,12 @@ void check_tree(std::vector<int>& route, float time_so_far, float cost_so_far, i
         if (cost > best_cost) {
             best_cost = cost;
             best_route = route;
-            std::cout << "new best cost " << best_cost << " with route [";
+            /*std::cout << "new best cost " << best_cost << " with route [";
             for (auto i: best_route)
             {
                 std::cout << i << ", ";
             }
-            std::cout << "]\n";
+            std::cout << "]\n"; */
             best_updates++;
         }
         valid++;
@@ -213,24 +209,37 @@ void check_tree(std::vector<int>& route, float time_so_far, float cost_so_far, i
         route.pop_back();
         global_passengers[route.back()][i] += passengers;
     }
-    if (depth < 3)
-        std::cout << "depth " << depth << " checked " << checked << " valid " << valid << std::endl;
+    //if (depth < 3)
+        //std::cout << "depth " << depth << " checked " << checked << " valid " << valid << std::endl;
 }
 
 int main(int argc, char* argv[])
 {
-    int homebase = 0;
     std::vector<int> route;
     route.reserve(20);
-    route.push_back(homebase);
 
-    check_tree(route, 0, 0, 0);
-        std::cout << "final best cost " << best_cost << " with route [";
+    for (int homebase = 0; homebase < 28; homebase++)
+    {
+        route.push_back(homebase);
+        check_tree(route, 0, 0, 0);
+        std::cout << "final best cost for city " << homebase << " is " << 
+            best_cost << " with route [";
+        //std::cout << homebase << " " << best_cost << std::endl;
         for (auto i: best_route)
         {
             std::cout << i << ", ";
         }
         std::cout << "]\n";
+        route.pop_back();
+
+        checked = 0;
+        valid = 0;
+
+        best_cost = 0;
+        best_updates = 0;
+        best_route.clear();
+
+    }
    
     return 0;
 }

@@ -71,7 +71,7 @@ int find_minimum_refuelings(std::vector<int>& tour)
         int current_index = shift;
         do {
             int next_index = (current_index + 1) % tour_size;
-            int distance = DISTANCES[current_index][next_index];
+            int distance = DISTANCES[tour[current_index]][tour[next_index]];
             if (tank < distance) {
                 tank = 3199;
                 refuelings++;
