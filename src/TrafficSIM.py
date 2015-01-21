@@ -13,7 +13,9 @@ from newsubtourgen import *
 
 
 def choose_transition(new_points, prev_points, temperature):
-    if new_points > prev_points:
+    if new_points==prev_points:
+        return False
+    elif new_points > prev_points:
         return True
     else:
         #new_points = 1.0/(new_points+1)
@@ -26,7 +28,6 @@ def choose_transition(new_points, prev_points, temperature):
 
 class Traffic(object):
     NUMBER_OF_AIRPLANES = 6
-    
     PASSENGERS = [[0,213,119,278,89,302,388,153,341,273,112,361,302,324,269,206,147,400,367,172,45,321,100,135,86,95,257,371],
                   [373,0,377,341,202,161,354,182,424,69,96,52,141,5,224,425,277,88,380,290,444,89,0,28,376,296,323,7],
                   [403,165,0,327,231,403,113,287,218,264,443,166,436,322,37,206,252,291,414,271,223,287,408,251,127,299,3,58],
@@ -60,7 +61,7 @@ class Traffic(object):
     
     def __init__(self):
         self.currentTime = 0.0
-        self.simNum = 100
+        self.simNum = 5
         self.passengers = copy.deepcopy(self.PASSENGERS)
         self.distanceMap = DistanceMap()
         self.cities = self.distanceMap.getCities()
@@ -74,6 +75,9 @@ class Traffic(object):
         #try to change values to create a frame
 
         best_score = [0 for i in range(self.simNum)]
+        best_tour = []
+
+        numberOfBest = 0
 
         for k in range(self.simNum):
             print("Simulation number %d" %k)
@@ -82,15 +86,18 @@ class Traffic(object):
             best_current_time = None
             prev_tours = None
 
+            bestOfRun = 0
+            bestOfRunTour = None
+
             #f = open("score_over_time.dat", "w")
             
-            temperature = 25000
+            temperature = 550
             totalCounter = 0
             counter = 0 
 
             a = datetime.datetime.now()
 
-            while counter<2000:
+            while counter<1000:
 
                 traffic = [0 for x in range(self.NUMBER_OF_AIRPLANES)]
 
@@ -98,7 +105,6 @@ class Traffic(object):
                     tours = []
                     for i in xrange(self.NUMBER_OF_AIRPLANES):
                         tours.append(gen_tour())
-                    
                 else:
                     changing_flight = random.randrange(0,self.NUMBER_OF_AIRPLANES)
                     tours = copy.deepcopy(prev_tours)
@@ -142,13 +148,16 @@ class Traffic(object):
                 for airplane in traffic:
                     traffic_points += airplane.getAirplanePoints()
 
-                #if choose_transition(traffic_points, best_score[k], temperature):
-                if traffic_points > best_score[k]:
+                if choose_transition(traffic_points, best_score[k], temperature):
+                #if traffic_points > best_score[k]:
                     if totalCounter%100 == 0: pass
                         #print "Iterations: ", totalCounter
                         #print "New best score: ", traffic_points
                         #print "Temperature: ", temperature
                     best_score[k] = traffic_points
+                    if best_score[k]>bestOfRun:
+                        bestOfRun = best_score[k]
+                        bestOfRunTour = tours
                     best_traffic = traffic
                     best_passengers = self.passengers
                     best_current_time = self.currentTime
@@ -162,30 +171,48 @@ class Traffic(object):
 
                 #f.write(str(totalCounter) + " " + str(best_score) + "\n")
 
-                temperature *= 0.999
+                temperature *= 0.99999
+
+            if best_score[k]==2005124:
+                numberOfBest+=1
+
+            best_score[k] = bestOfRun
+            best_tour.append(bestOfRunTour)
 
             b = datetime.datetime.now()
 
             print "Iterations: ", totalCounter
-            print "New best score: ", best_score[k]
+            print "New best score: ", bestOfRun
+            print "New best route: ", bestOfRunTour
             print "Temperature: ", temperature
             print "Time: %s\n" %((b-a))
 
-            self.passengers = best_passengers
-            self.currentTime = best_current_time
+            self.passengers = copy.deepcopy(self.PASSENGERS)
+            self.currentTime = 0.0
             #f.close()
 
         SampleVariance = 0.0
 
         bestScore = max(best_score)
+        indexMax = 0
+
+        for i in range(len(best_score)):
+            if best_score[i]>bestScore:
+                bestScore = best_score[i]
+                indexMax = i
+
         averageScore = int(round(sum(best_score)/self.simNum))
 
         for i in range(0,self.simNum):
             SampleVariance = SampleVariance + (best_score[i]-averageScore)**2/(self.simNum-1)
 
         print "Beste van %d runs is: %d" %(self.simNum,bestScore)
+        print "Met route: ", best_tour[indexMax]
         print "Gemiddelde van %d runs is: %d" %(self.simNum,averageScore)
         print "Standaard afwijking van %d runs is: %s" %(self.simNum,(SampleVariance)**0.5)
+
+        if self.NUMBER_OF_AIRPLANES==1:
+            print "Aantal keer beste score: ", numberOfBest
         return best_traffic
     
     def updatePassengerTable(self, city1, city2, numberOfPassengers):
