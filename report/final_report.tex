@@ -25,9 +25,7 @@ Abstract text to go here.
 
 
 \section{Introduction}
-In this report, we will produce a flight schedule for six airplanes for the airline Mokum Airways with as goal to maximize the passengers-kilometers. In order to obtain the best flight schedule, we use heuristics algorithms to analyze all the possible tours and find the optimal one. 
-
-\section{Problem}
+In this report, we will produce a flight schedule for six airplanes for the airline Mokum Airways with as goal to maximize the passengers-kilometers. In order to obtain the best flight schedule, we use heuristics algorithms to analyze all the possible tours and find the optimal one.\\
 Mokum Airways, a newly created Dutch airline based in Amsterdam, has landing rights for 28 destinations around Europe. \\
 \begin{figure}[!h]
 \centering
@@ -37,6 +35,9 @@ Mokum Airways, a newly created Dutch airline based in Amsterdam, has landing rig
 \end{figure}
 The problem is how their flight schedule should look like with as goal to maximizes the number of passenger-kilometers. The number of passenger-kilometers is the number of passenger times the number of kilometers in the air. This goal is important for the airline, because the number of passenger-kilometers determines the profit. \\
 The airline has a fleet of six Airbus A321 aircrafts with speed of 800km/h, capacity of 199 and range of 3199 km.  The take-off and landing take place between 02:00 and 06:00 and docking time and refuel time will take one hour. Moreover, once per day the plane needs to land in the home-base for the crew-change. The flight schedule has to be a cycle, so the start point and the end point of the route has to be the same. \\
+
+\section{Background}
+Some example citations \cite{Langerman1997} \cite{Lohatepanont2004} \cite{Mashford2001}.
 \section{Algorithm}
 To deal with the problem, we use two heuristic algorithms, namely hill-climbing and simulated annealing for six airplanes and one algorithm brute force for one airplane.
 
@@ -84,6 +85,7 @@ To analyze the quality of the heuristic algorithms, Hill-climbing and simulated 
 \label{fig:error_sa_hc}
 \end{figure}
 \section{Conclusions}
-\section{References}
+\bibliographystyle{IEEEtran}
+\bibliography{final_report}
 \end{document}
 
