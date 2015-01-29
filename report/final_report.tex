@@ -26,7 +26,7 @@ Abstract text to go here.
 
 \section{Introduction}
 Flight schedules take up a central place in airline businesses. To maximize profit a business has to be as efficient as possible in using its resources and be as effective as possible in meeting marketplace demand. A business wants to plan its flights based on demand, use its airplanes to service these flights as efficiently as possible and assign crews to these flights to minimize expenses. These pose highly complex combinatorial optimization problems that cannot be solved analytically. Instead numerical optimization systems are used and their effectiveness can be influential on the profitability of a passenger focusses airline as a whole.\\
-The Dutch airline KLM flies on 150 destinations with 97 airplanes and needs to produce a flight schedule four times a year that maximizes their profitability \cite{Bian2003}. In this report we will consider this problem in a slightly reduced scenario, with a fictional Mokum Airways that flies on 28 destinations with 6 airplanes. The goal is to maximize profit as measured by revenue passenger kilometers, often used as unit to measure the product being sold in a passenger focussed airline \cite{Schefczyk1993}. In order to obtain the best flight schedule, we use heuristics algorithms to analyze all the possible tours and find the optimal one.\\
+The Dutch airline KLM flies on 150 destinations with 97 airplanes and needs to produce a flight schedule four times a year that maximizes their profitability \cite{Bian2003}. In this paper we will consider this problem in a slightly reduced scenario, with a fictional Mokum Airways that flies on 28 destinations with 6 airplanes. The goal is to maximize profit as measured by revenue passenger kilometers, often used as unit to measure the product being sold in a passenger focussed airline \cite{Schefczyk1993}. In order to obtain the best flight schedule, we use heuristics algorithms to analyze all the possible tours and find the optimal one.\\
 
 \section{Background}
 Constructing airline schedules can be broken down in a number of subproblems, each posing a number of computational and algorithmic challenges. Often first the flights that are provided by an airline are constructed, usually subject to complex regulation and non-deterministic customer demand functions. This is referred to as the Airline Scheduling problem in the literature, where the goal is to maximize profits by meeting said demands \cite{Etschmaier1985}. \\
@@ -34,6 +34,18 @@ The next step is to assign the flights that are flown to airplanes. This is the 
 Finally crew personnel is assigned to the flights and airplanes. Thus crew scheduling problem is subject to constraints from flight authority regulation, labour regulation and airline specific regulation and because it represents the largest expenditure for airlines after fuel cost it is an important area of research for the industry as well \cite{Gopalakrishnan2005}.\\
 This paper tackles the design and optimization of an airline schedule, with airplane assignment being part of the designed schedule. The one consideration given to the constraints from the crew schedule problem is that the schedule needs to have single homebase, each crew member is assumed to live at said homebase and each plane needs to attend that homebase daily for a crew change.\\
 There are various approaches to this problem, such as integer programming\cite{Raff1983} or even agent based approaches \cite{Langerman1997}. One candidate for complex combinatorial optimization problems in general is Simulated Annealing \cite{kirkpatrick1983optimization}. This meta-heuristic has been applied to related problems such as crew scheduling \cite{Sosnowska2001}. It has been specifically used for airline scheduling by \cite{Mashford2001}, which is the main reference for the research described in this paper.
+\section{Problem}
+There are multiple formalisations of the problem to be found in the literature. We mostly follow \cite{Mashford2001}, because it most closely matches our research. Let $X$ be the set of nodes representing the airports. $G \subset X \times X$ is the service graph, making up all the valid flightpaths between two airports. In the example scenario we consider this will be the full Cartesian product between all airports, see figure~\ref{fig:service_graph}.
+\\
+\begin{figure}[!h]
+\centering
+\includegraphics[width=2.3in]{service_graph}
+\caption{Service graph.}
+\label{fig:service_graph}
+\end{figure}
+\\
+We schedule over an interval $[T_1, T_2]$, with $T_1 < T_2$. The fleet is defined as $F = \{p_1 \cdots p_n\}$, with $p_i$ being an airplane. The schedule for a plane is a list of flights, which are defined as quadruples $(x, y, t, p)$, with $x \in X$ the flight origin, $y \in X$ the destination, $t \in [T_1, T_2]$ the departure time and $p\in F$ the plane. \\
+An airline schedule is then defined as [TODO]
 \section{Algorithm}
 To deal with the problem, we use two heuristic algorithms, namely hill-climbing and simulated annealing for six airplanes and one algorithm brute force for one airplane.
 
