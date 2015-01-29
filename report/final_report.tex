@@ -25,19 +25,15 @@ Abstract text to go here.
 
 
 \section{Introduction}
-In this report, we will produce a flight schedule for six airplanes for the airline Mokum Airways with as goal to maximize the passengers-kilometers. In order to obtain the best flight schedule, we use heuristics algorithms to analyze all the possible tours and find the optimal one.\\
-Mokum Airways, a newly created Dutch airline based in Amsterdam, has landing rights for 28 destinations around Europe. \\
-\begin{figure}[!h]
-\centering
-\includegraphics[width=2.5in]{europe}
-\caption{Mokum Airways destinations}
-\label{fig:europe}
-\end{figure}
-The problem is how their flight schedule should look like with as goal to maximizes the number of passenger-kilometers. The number of passenger-kilometers is the number of passenger times the number of kilometers in the air. This goal is important for the airline, because the number of passenger-kilometers determines the profit. \\
-The airline has a fleet of six Airbus A321 aircrafts with speed of 800km/h, capacity of 199 and range of 3199 km.  The take-off and landing take place between 02:00 and 06:00 and docking time and refuel time will take one hour. Moreover, once per day the plane needs to land in the home-base for the crew-change. The flight schedule has to be a cycle, so the start point and the end point of the route has to be the same. \\
+Flight schedules take up a central place in airline businesses. To maximize profit a business has to be as efficient as possible in using its resources and be as effective as possible in meeting marketplace demand. A business wants to plan its flights based on demand, use its airplanes to service these flights as efficiently as possible and assign crews to these flights to minimize expenses. These pose highly complex combinatorial optimization problems that cannot be solved analytically. Instead numerical optimization systems are used and their effectiveness can be influential on the profitability of a passenger focusses airline as a whole.\\
+The Dutch airline KLM flies on 150 destinations with 97 airplanes and needs to produce a flight schedule four times a year that maximizes their profitability \cite{Bian2003}. In this report we will consider this problem in a slightly reduced scenario, with a fictional Mokum Airways that flies on 28 destinations with 6 airplanes. The goal is to maximize profit as measured by revenue passenger kilometers, often used as unit to measure the product being sold in a passenger focussed airline \cite{Schefczyk1993}. In order to obtain the best flight schedule, we use heuristics algorithms to analyze all the possible tours and find the optimal one.\\
 
 \section{Background}
-Some example citations \cite{Langerman1997} \cite{Lohatepanont2004} \cite{Mashford2001}.
+Constructing airline schedules can be broken down in a number of subproblems, each posing a number of computational and algorithmic challenges. Often first the flights that are provided by an airline are constructed, usually subject to complex regulation and non-deterministic customer demand functions. This is referred to as the Airline Scheduling problem in the literature, where the goal is to maximize profits by meeting said demands \cite{Etschmaier1985}. \\
+The next step is to assign the flights that are flown to airplanes. This is the so-called Fleet Scheduling Problem \cite{Rushmeier1997}. An airplane schedule can be constructed ahead of time, but scheduling methods for real world scenarios need to deal with real-time adjustments as well due to delays on the day itself (e.g. due to weather conditions, technical problems or issues at an airport). Ideally these schedules are repeatable (usually over either a one or seven day period), requiring that if at the start of the day an aircraft is at airport A, there needs to be an aircraft (not necessarily the exact same, just one of the same type) at airport A at the end of the schedule. \\
+Finally crew personnel is assigned to the flights and airplanes. Thus crew scheduling problem is subject to constraints from flight authority regulation, labour regulation and airline specific regulation and because it represents the largest expenditure for airlines after fuel cost it is an important area of research for the industry as well \cite{Gopalakrishnan2005}.\\
+This paper tackles the design and optimization of an airline schedule, with airplane assignment being part of the designed schedule. The one consideration given to the constraints from the crew schedule problem is that the schedule needs to have single homebase, each crew member is assumed to live at said homebase and each plane needs to attend that homebase daily for a crew change.\\
+There are various approaches to this problem, such as integer programming\cite{Raff1983} or even agent based approaches \cite{Langerman1997}. One candidate for complex combinatorial optimization problems in general is Simulated Annealing \cite{kirkpatrick1983optimization}. This meta-heuristic has been applied to related problems such as crew scheduling \cite{Sosnowska2001}. It has been specifically used for airline scheduling by \cite{Mashford2001}, which is the main reference for the research described in this paper.
 \section{Algorithm}
 To deal with the problem, we use two heuristic algorithms, namely hill-climbing and simulated annealing for six airplanes and one algorithm brute force for one airplane.
 
@@ -76,6 +72,15 @@ In figure~\ref{fig:flowchart_sa}, the flowchart of hill-climbing is adjusted in 
 In the case when the passengers-kilometer score is not improved, you will accept the permutation tour with probability $P = e^{\frac{−\Delta C}{T}} $, where ∆C = score of the permutation tour − score of the current best tour and $T = 0, 999^i * T_0$ with $i$ is the number of iterations and $T_0$ is the start temperature 50.000.
  This probability will decrease with the number of iterations. Thus when the number of iterations increases, the temperature goes down. When temperature is high, the system will choose new states more or less at random, but as the temperature lowers this algorithm will go to hill-climbing. 
 \section{Result}
+To validate our method, demand and flight distances for a fictional airline are used. Mokum Airways, a newly created Dutch airline based in Amsterdam, has landing rights for 28 destinations around Europe.\\
+\begin{figure}[!h]
+\centering
+\includegraphics[width=2.5in]{europe}
+\caption{Mokum Airways destinations}
+\label{fig:europe}
+\end{figure}
+\\
+The airline has a fleet of six Airbus A321 aircrafts with speed of 800km/h, capacity of 199 and range of 3199 km.  The take-off and landing take place between 02:00 and 06:00 and docking time and refuel time will take one hour. Moreover, once per day the plane needs to land in the home-base for the crew-change. The flight schedule has to be a cycle, so the start point and the end point of the route has to be the same. \\
 \section{Analysis}
 To analyze the quality of the heuristic algorithms, Hill-climbing and simulated annealing. We use the result of the brute force for one airplane as reference, since the result is the global maximum. In graph 1, the RMSE of the score for simulated annealing is plotted. When the iterations increase, the RMSE will decrease. The number of iterations depends on the cooling rate, a lower cooling rate will 
 \begin{figure}[!h]
