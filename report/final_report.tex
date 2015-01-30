@@ -8,6 +8,9 @@
 \usepackage[pdftex]{graphicx}
 \usepackage{amsmath}
 \usepackage{float}
+\usepackage{listings}
+
+\lstset{language=Python, basicstyle=\ttfamily\scriptsize, breaklines=true}
 
 \author{Chi Chun Wan -- 2525244\\
 Shabaz Sultan -- 2566703\\
@@ -100,6 +103,14 @@ To validate our method, demand and flight distances for a fictional airline are 
 \end{figure}
 \\
 The airline has a fleet of six Airbus A321 aircrafts with speed of 800km/h, capacity of 199 and range of 3199 km.  The take-off and landing take place between 02:00 and 06:00 and docking time and refuel time will take one hour. Moreover, once per day the plane needs to land in the home-base for the crew-change. The flight schedule has to be a cycle, so the start point and the end point of the route has to be the same. \\
+We first tested with schedulig one airplane, to set our parameters. For we could compare those results with the global optimum very soon (obtained by bruteforcing), we could set the parameters such that we found that optimum the most. These settings are then used in scheduling for six airplanes too. These parameters were eventually set as follows. The cooling rate of the simulated annealing was set at 0.99999, as we found that a slow cooling gave more accurate results (although it was a bit slower). The initial temperature is set at 50.000 per plane, and thus in a simulation of six airplanes the initial temperature was 6*50.000. Then finally we terminated the simulation when more than 1000 times the accepted schedule had not changed. Of course settings this higher will results in some more accuracy, but the runtime started to get really long when we did that.  \\
+One way to see if the simulated annealing was behaving properly is by looking at a graph of the score during the course of the simulation. This is shown in figure (\ref{fig:simulated_annealing_score}). We see that at first it is indeed very random, which simulated annealing is supposed to be in the beginning. Then when temperature drops to lower values the score becomes less random and will look more and more like a hill climber. Then if converges to what the simulation believes is the global optimum (although this is of course not always the case). \\
+\begin{figure}[H]
+\centering
+\includegraphics[width=2.5in]{score_over_time}
+\caption{Score over time for Simulated Annealing}
+\label{fig:simulated_annealing_score}
+\end{figure}
 For the results of flying with one airplane we made a plot of the best score for each home-base. This is seen in figure (\ref{fig:different_homebase_one_plane}). What we can see for instance is that Barcelona, Helsinki and Reykjavik are the best home-bases to have, having a score of 2.195.766, see figure (\ref{fig:one_plane}). If we would set Amsterdam as our home-base, which is a special case that is nice to look at (for we all live in the Netherlands), then the best score would be 2.069.202, see figure (\ref{fig:one_plane_amsterdam}).
 \\
 \begin{figure}[!h]
@@ -116,8 +127,9 @@ For the results of flying with one airplane we made a plot of the best score for
 \label{fig:one_plane_amsterdam}
 \end{figure}
 \\
-As our other goal was a schedule with six airplanes, we present those results now. Let us begin with figure (\ref{different_homebase_six_planes}). Here we see the score of both the described bruteforce algorithm as of the simulated annealer. We also see the score of what would have been if we could fly with six identical planes that fly the best route for one plane. (This is of course not possible as there are not enough passengers waiting at the gates). We can use this as a comparison, analysing this in the next section. \\
-So if we set our home-base in Amsterdam, we see the best score we found with simulated annealing is 12.388.745. The highest score of all with simulated annealing is [NOG IN TE VULLEN] with Lisbon as home-base. What can clearly be seen is that most of the times the simulated annealer is not far off from our bruteforce approach. This indicates that our simulated annealer works quite well, further analysed in the next section. What also can be seen is that both the algorithms have about the same peaks as the theoretical six-times-one-plane situation has. This indicates a strong correlation between these two, and thus let us estimate the behavior of six planes off the behavior of one plane.
+As our other goal was a schedule with six airplanes, we present those results now. Let us begin with figure (\ref{fig:different_homebase_six_planes}). Here we see the score of both the described bruteforce algorithm as of the simulated annealer. We also see the score of what would have been if we could fly with six identical planes that fly the best route for one plane. (This is of course not possible as there are not enough passengers waiting at the gates). We can use this as a comparison, analysing this in the next section. \\
+So if we set our home-base in Amsterdam, we see the best score we found with simulated annealing is 12.388.745. The highest score of all with simulated annealing is 12.892.414 with Lisbon as home-base. With our bruteforce algorithm we found an alltime highest score of 12.908.931, again with Lisbon as home-base.\\
+What can clearly be seen is that most of the times the simulated annealer is not far off from our bruteforce approach. This indicates that our simulated annealer works quite well, further analysed in the next section. \\
 \begin{figure}[!h]
 \centering
 \includegraphics[width=2.5in]{different_homebases}
@@ -125,22 +137,49 @@ So if we set our home-base in Amsterdam, we see the best score we found with sim
 \label{fig:different_homebase_six_planes}
 \end{figure}
 \\
-\begin{figure}[!h]
-\centering
-\includegraphics[width=2.5in]{score_over_time}
-\caption{Score over time for Simulated Annealing}
-\label{fig:simulated_annealing_score}
-\end{figure}
+We also have results on the average number of iterations the simulated annealing simulation needed to find the optimum. Let us look at the following table.
+\begin{lstlisting}
+Average number of iterations: 328075.885714
+Variance of the n.o.i.: 2025145743.66
+Standard deviation of the n.o.i.: 45001.6193448
+\end{lstlisting}
+We see that the simulation needed quite alot of iterations before terminating. For this data we have done 5 runs per home-base for each home-base, so 5*28 runs. \\
+What also can be seen is that both the algorithms have about the same peaks as the theoretical six-times-one-plane situation has. This indicates a strong correlation between these two, and thus let us estimate the behavior of six planes off the behavior of one plane.
 \\
 \section{Analysis}
-To analyze the quality of the heuristic algorithms, Hill-climbing and simulated annealing. We use the result of the brute force for one airplane as reference, since the result is the global maximum. In graph 1, the RMSE of the score for simulated annealing is plotted. When the iterations increase, the RMSE will decrease. The number of iterations depends on the cooling rate, a lower cooling rate will 
-\begin{figure}[!h]
+To analyze the solution of simulated annealing. We use the result of the brute force for one airplane as reference, since the result is the global maximum. In table (1), the percentage of the global optimum found for simulated annealing is given for different cooling rate. When the decimals for the cooling rate increases, the percentage global optimum found will increase strongly, because more iterations will be run and therefore the probability to find the global optimum will be higher.
+\begin{table}[h]
+\begin{tabular}{ll}
+Cooling Rate & Percentage global optimum found \\
+0.99         & 4\%                             \\
+0.999        & 6\%                             \\
+0.9999       & 38\%                            \\
+0.99999      & 83\%                              
+\end{tabular}
+\caption{\tiny{Table 1, Score one airplane SA, 100 runs, T0 = 50.000}}
+\end{table}
+\\
+Moreover, the quality of our heuristics is tested. In figure (\ref{fig:error_sa_hc}), the RMSE of the score for simulated annealing is plotted as a black line. The number of iterations depends on the cooling rate, a lower cooling rate will increase the number of iterations and thereby the run time. However, the RMSE  decreases with the number of iterations. Thus, the result will be more accurate. 
+\\
+\\
+To analyze the two heuristics, hill climbing and simulated annealing, we can look at the same figure (\ref{fig:error_sa_hc}) for both heuristics for the same iterations against the RMSE. The RMSE for the same iteration for the hill climber is  higher than the simulated annealing. Thus, the simulated annealing is in this case better for finding the optimal solution than the hill climbing, since the risk to get into a local optimum is limited. 
+\\
+\\
+An interesting analysis is whether the solution for one airplane can predict the solution for six airplanes. In figure (\ref{fig:different_homebase_six_planes}), the score times 6 for one airplane follows almost the same pattern as the score of the simulated annealing for six airplanes for different home bases. We ran a correlation test. This resulted in a correlation coefficient of 0.820 for simulated annealing. Therefore, we can conclude there is a correlation between the prediction for the score of six airplanes when the score for one airplane is known. 
+\\
+\\
+
+\begin{figure}[H]
 \centering
 \includegraphics[width=2.5in]{iterations_vs_error_sa_hc}
-\caption{Error for Simulated Annealing and Hill-climbing.}
+\caption{Error for Simulated Annealing and Hill-climbing.\tiny}
 \label{fig:error_sa_hc}
 \end{figure}
 \section{Conclusions}
+In conclusion we can say that our simulated annealer works very well. After analyzing the various results we see that compared to the bruteforcer our simulated annealer performs very close to it. Also with a runtime of between 10 and 30 minutes to find an optimal schedule for six airplanes, it is not all that slow. Of course one can do the simulation faster, but we showed that the accuracy of the results then will decline.\\ 
+We can conclude as well that the simulated annealer works better than the hill climber, as discussed in the analysis section.
+We also showed that the outcome of scheduling six airplanes can be predicted with the output of the simulation with one plane. We found a high correlation between the global optimum of one airplane and the global optimum of six airplanes, and this can be seen also in figure (\ref{fig:different_homebase_six_planes}), as the peaks agree of both sources. \\
+
 \bibliographystyle{IEEEtran}
 \bibliography{final_report}
 \end{document}
