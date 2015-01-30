@@ -104,14 +104,14 @@ For the results of flying with one airplane we made a plot of the best score for
 \\
 \begin{figure}[!h]
 \centering
-\includegraphics[width=2.5in, trim=0 0 0 2, clip=true]{best_tour_one_plane}
-\caption{Best tour for one plane with any homebase, passenger kilometer score 2.195.766.}
+\includegraphics[width=2.5in]{best_tour_one_plane}
+\caption{Best tour for one plane with any homebase, passenger kilometer score 2.215.268.}
 \label{fig:one_plane}
 \end{figure}
 \\
 \begin{figure}[!h]
 \centering
-\includegraphics[width=2.5in, trim=0 0 0 2, clip=true]{best_tour_one_plane_amsterdam}
+\includegraphics[width=2.5in]{best_tour_one_plane_amsterdam}
 \caption{Best tour for one plane with homebase Amsterdam, passenger kilometer score 2.069.202.}
 \label{fig:one_plane_amsterdam}
 \end{figure}
@@ -120,28 +120,16 @@ As our other goal was a schedule with six airplanes, we present those results no
 So if we set our home-base in Amsterdam, we see the best score we found with simulated annealing is 12.388.745. The highest score of all with simulated annealing is [NOG IN TE VULLEN] with Lisbon as home-base. What can clearly be seen is that most of the times the simulated annealer is not far off from our bruteforce approach. This indicates that our simulated annealer works quite well, further analysed in the next section. What also can be seen is that both the algorithms have about the same peaks as the theoretical six-times-one-plane situation has. This indicates a strong correlation between these two, and thus let us estimate the behavior of six planes off the behavior of one plane.
 \begin{figure}[!h]
 \centering
-<<<<<<< HEAD
 \includegraphics[width=2.5in]{different_homebases}
 \caption{Results for different homebases with six planes, Simulated Annealing line based on best of 5 runs for each scenario, cooling rate of $0.99999$.}
 \label{fig:different_homebase_six_planes}
-=======
-\includegraphics[width=2.5in]{best_tour_one_plane_amsterdam}
-\caption{Best tour for one plane with homebase Amsterdam, passenger kilometer score 2069202.}
-\label{fig:one_plane_amsterdam}
->>>>>>> fa934fa8981cf4c6513ead072c7cf745d2ddb257
 \end{figure}
 \\
 \begin{figure}[!h]
 \centering
-<<<<<<< HEAD
 \includegraphics[width=2.5in]{score_over_time}
 \caption{Score over time for Simulated Annealing}
 \label{fig:simulated_annealing_score}
-=======
-\includegraphics[width=2.5in]{best_tour_one_plane}
-\caption{Best tour for one plane with any homebase, passenger kilometer score 2215268.}
-\label{fig:one_plane}
->>>>>>> fa934fa8981cf4c6513ead072c7cf745d2ddb257
 \end{figure}
 \\
 \section{Analysis}
