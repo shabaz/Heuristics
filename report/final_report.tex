@@ -93,6 +93,26 @@ To validate our method, demand and flight distances for a fictional airline are 
 \end{figure}
 \\
 The airline has a fleet of six Airbus A321 aircrafts with speed of 800km/h, capacity of 199 and range of 3199 km.  The take-off and landing take place between 02:00 and 06:00 and docking time and refuel time will take one hour. Moreover, once per day the plane needs to land in the home-base for the crew-change. The flight schedule has to be a cycle, so the start point and the end point of the route has to be the same. \\
+\begin{figure}[!h]
+\centering
+\includegraphics[width=2.5in]{different_homebases_one_plane}
+\caption{Global optimum for different homebases with one plane}
+\label{fig:different_homebase_one_plane}
+\end{figure}
+\\
+\begin{figure}[!h]
+\centering
+\includegraphics[width=2.5in]{different_homebases}
+\caption{Results for different homebases with six planes, Simulated Annealing line based on best of 5 runs for each scenario, cooling rate of $0.99999$.}
+\label{fig:different_homebase_six_planes}
+\end{figure}
+\\
+\begin{figure}[!h]
+\centering
+\includegraphics[width=2.5in]{score_over_time}
+\caption{Score over time for Simulated Annealing}
+\label{fig:simulated_annealing_score}
+\end{figure}
 \section{Analysis}
 To analyze the quality of the heuristic algorithms, Hill-climbing and simulated annealing. We use the result of the brute force for one airplane as reference, since the result is the global maximum. In graph 1, the RMSE of the score for simulated annealing is plotted. When the iterations increase, the RMSE will decrease. The number of iterations depends on the cooling rate, a lower cooling rate will 
 \begin{figure}[!h]
