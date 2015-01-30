@@ -99,8 +99,25 @@ To validate our method, demand and flight distances for a fictional airline are 
 \label{fig:different_homebase_one_plane}
 \end{figure}
 \\
-
+The airline has a fleet of six Airbus A321 aircrafts with speed of 800km/h, capacity of 199 and range of 3199 km.  The take-off and landing take place between 02:00 and 06:00 and docking time and refuel time will take one hour. Moreover, once per day the plane needs to land in the home-base for the crew-change. The flight schedule has to be a cycle, so the start point and the end point of the route has to be the same. \\
+For the results of flying with one airplane we made a plot of the best score for each home-base. This is seen in figure (\ref{fig:different_homebase_one_plane}). What we can see for instance is that Barcelona, Helsinki and Reykjavik are the best home-bases to have, having a score of 2.195.766, see figure (\ref{fig:one_plane}). If we would set Amsterdam as our home-base, which is a special case that is nice to look at (for we all live in the Netherlands), then the best score would be 2.069.202, see figure (\ref{fig:one_plane_amsterdam}).
 \\
+\begin{figure}[!h]
+\centering
+\includegraphics[width=2.5in, trim=0 0 0 2, clip=true]{best_tour_one_plane}
+\caption{Best tour for one plane with any homebase, passenger kilometer score 2.195.766.}
+\label{fig:one_plane}
+\end{figure}
+\\
+\begin{figure}[!h]
+\centering
+\includegraphics[width=2.5in, trim=0 0 0 2, clip=true]{best_tour_one_plane_amsterdam}
+\caption{Best tour for one plane with homebase Amsterdam, passenger kilometer score 2.069.202.}
+\label{fig:one_plane_amsterdam}
+\end{figure}
+\\
+As our other goal was a schedule with six airplanes, we present those results now. Let us begin with figure (\ref{different_homebase_six_planes}). Here we see the score of both the described bruteforce algorithm as of the simulated annealer. We also see the score of what would have been if we could fly with six identical planes that fly the best route for one plane. (This is of course not possible as there are not enough passengers waiting at the gates). We can use this as a comparison, analysing this in the next section. \\
+So if we set our home-base in Amsterdam, we see the best score we found with simulated annealing is 12.388.745. The highest score of all with simulated annealing is [NOG IN TE VULLEN] with Lisbon as home-base. What can clearly be seen is that most of the times the simulated annealer is not far off from our bruteforce approach. This indicates that our simulated annealer works quite well, further analysed in the next section. What also can be seen is that both the algorithms have about the same peaks as the theoretical six-times-one-plane situation has. This indicates a strong correlation between these two, and thus let us estimate the behavior of six planes off the behavior of one plane.
 \begin{figure}[!h]
 \centering
 \includegraphics[width=2.5in]{different_homebases}
@@ -115,19 +132,6 @@ To validate our method, demand and flight distances for a fictional airline are 
 \label{fig:simulated_annealing_score}
 \end{figure}
 \\
-\begin{figure}[!h]
-\centering
-\includegraphics[width=2.5in, trim=0 0 0 2, clip=true]{best_tour_one_plane}
-\caption{Best tour for one plane with homebase Amsterdam, passenger kilometer score 2069202.}
-\label{fig:one_plane_amsterdam}
-\end{figure}
-\\
-\begin{figure}[!h]
-\centering
-\includegraphics[width=2.5in, trim=0 0 0 2, clip=true]{best_tour_one_plane}
-\caption{Best tour for one plane with any homebase, passenger kilometer score 2195766.}
-\label{fig:one_plane}
-\end{figure}
 \section{Analysis}
 To analyze the quality of the heuristic algorithms, Hill-climbing and simulated annealing. We use the result of the brute force for one airplane as reference, since the result is the global maximum. In graph 1, the RMSE of the score for simulated annealing is plotted. When the iterations increase, the RMSE will decrease. The number of iterations depends on the cooling rate, a lower cooling rate will 
 \begin{figure}[!h]
