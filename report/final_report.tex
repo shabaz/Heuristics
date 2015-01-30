@@ -113,6 +113,20 @@ The airline has a fleet of six Airbus A321 aircrafts with speed of 800km/h, capa
 \caption{Score over time for Simulated Annealing}
 \label{fig:simulated_annealing_score}
 \end{figure}
+\\
+\begin{figure}[!h]
+\centering
+\includegraphics[width=2.5in, trim=0 0 0 2, clip=true]{best_tour_one_plane}
+\caption{Best tour for one plane with homebase Amsterdam, passenger kilometer score 2069202.}
+\label{fig:one_plane_amsterdam}
+\end{figure}
+\\
+\begin{figure}[!h]
+\centering
+\includegraphics[width=2.5in, trim=0 0 0 2, clip=true]{best_tour_one_plane}
+\caption{Best tour for one plane with any homebase, passenger kilometer score 2195766.}
+\label{fig:one_plane}
+\end{figure}
 \section{Analysis}
 To analyze the quality of the heuristic algorithms, Hill-climbing and simulated annealing. We use the result of the brute force for one airplane as reference, since the result is the global maximum. In graph 1, the RMSE of the score for simulated annealing is plotted. When the iterations increase, the RMSE will decrease. The number of iterations depends on the cooling rate, a lower cooling rate will 
 \begin{figure}[!h]
