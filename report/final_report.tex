@@ -38,17 +38,21 @@ Finally crew personnel is assigned to the flights and airplanes. The crew schedu
 This paper tackles the design and optimization of an airline schedule, with airplane assignment being part of the designed schedule. The one consideration given to the constraints from the crew schedule problem is that the schedule needs to have single homebase, each crew member is assumed to live at said homebase and each plane needs to attend that homebase daily for a crew change.\\
 There are various approaches to this problem, such as integer programming \cite{Raff1983} or even agent based approaches \cite{Langerman1997}. One candidate for complex combinatorial optimization problems in general is Simulated Annealing \cite{kirkpatrick1983optimization}. This meta-heuristic has been applied to related problems such as crew scheduling \cite{Sosnowska2001}. It has been specifically used for airline scheduling by \cite{Mashford2001}, which is the main reference for the research described in this paper.
 \section{Problem}
-There are multiple formalisations of the problem to be found in the literature. We mostly follow \cite{Mashford2001}, because it most closely matches our research. Let $X$ be the set of nodes representing the airports. $G \subset X \times X$ is the service graph, making up all the valid flightpaths between two airports. In the example scenario we consider this will be the full Cartesian product between all airports, see figure~\ref{fig:service_graph}.
-\\
-\begin{figure}[!h]
-\centering
-\includegraphics[width=2.3in]{service_graph}
-\caption{Service graph.}
-\label{fig:service_graph}
-\end{figure}
-\\
-We schedule over an interval $[T_1, T_2]$, with $T_1 < T_2$. The fleet is defined as $F = \{p_1 \cdots p_n\}$, with $p_i$ being an airplane. The schedule for a plane is a list of flights, which are defined as quadruples $(x, y, t, p)$, with $x \in X$ the flight origin, $y \in X$ the destination, $t \in [T_1, T_2]$ the departure time and $p\in F$ the plane. \\
-An airline schedule is then defined as [TODO]
+We consider an airline with a number of potential destinations and airplanes. The specific dataset used has 28 destinations and potential flights in both directions between every possible pair of destinations. We will analyse the problem with one and six airplanes. We wish to schedule a number of flights over a one day period. Based on the number of passengers and length of the flights a passenger kilometer score can be calculated for each of these flights. The total passenger kilometer score is the metric that needs to be optimized for. The number of passengers are based on a deterministic demand function, where for each potential flight the total passenger demand for the day is provided. \\
+The flights are subject to a number of restrictions. In reality there are often regulatory flight restrictions only allowing take-offs and landing at certain hours of the day. We assume a 20 hour period of possible flight and that this 20 hour window is the same for every possible airport. This is a simplification that allows us to ignore timezone considerations. During this period there are a number of things that take up time. The flights will have a variable length of time, based on distance between start and end destination and speed of the aircraft (800 km/h in our example scenario). Docking takes up a certain amount of time (one hour in our example).\\
+Beside time the planes' operation is also restricted by fuel consumption. The plane has a certain tank capacity that allows it a certain range before it has to refuel (3199 km in the example). If a plane wants to fly a route without having enough fuel in its tank it needs to refuel first. We will only consider the scenario where refueling will completely fill up the tank and takes up a constant time (one hour). \\
+Finally we have two airline requirements. There is the requirement to have the schedule be repeatable. To fulfil this requirement each plane will have its starting airport also be its final destination of the day. The airline also has a certain destination airport designated as homebase, which every plane needs to attend during for a crew changeover. 
+%To more rigorously define the state-space to be explored we can define a mathematical formalisation. There are multiple formalisations of the problem to be found in the literature. We mostly follow \cite{Mashford2001}, because it most closely matches our research. Let $X$ be the set of nodes representing the airports. $G \subset X \times X$ is the service graph, making up all the valid flightpaths between two airports. In the example scenario we consider this will be the full Cartesian product between all airports, see figure~\ref{fig:service_graph}.
+%\\
+%\begin{figure}[!h]
+%\centering
+%\includegraphics[width=2.3in]{service_graph}
+%\caption{Service graph.}
+%\label{fig:service_graph}
+%\end{figure}
+%\\
+%We schedule over an interval $[T_1, T_2]$, with $T_1 < T_2$. The fleet is defined as $F = \{p_1 \cdots p_n\}$, with $p_i$ being an airplane. The schedule for a plane is a list of flights, which are defined as quadruples $(x, y, t, p)$, with $x \in X$ the flight origin, $y \in X$ the destination, $t \in [T_1, T_2]$ the departure time and $p\in F$ the plane. \\
+%An airline schedule is then defined as [TODO]
 \section{Algorithm}
 To deal with the problem, we use two heuristic algorithms, namely hill-climbing and simulated annealing for six airplanes and one algorithm brute force for one airplane.
 
@@ -175,6 +179,21 @@ An interesting analysis is whether the solution for one airplane can predict the
 \caption{Error for Simulated Annealing and Hill-climbing.\tiny}
 \label{fig:error_sa_hc}
 \end{figure}
+
+\section{Discussion}
+% SA beter with few airports, loads of planes?
+
+%proof of ergodicity
+
+%memoization
+
+%beter variant of greedy
+
+%cooling rate
+
+%50% acceptance, start temp.
+
+%GA
 \section{Conclusions}
 In conclusion we can say that our simulated annealer works very well. After analyzing the various results we see that compared to the bruteforcer our simulated annealer performs very close to it. Also with a runtime of between 10 and 30 minutes to find an optimal schedule for six airplanes, it is not all that slow. Of course one can do the simulation faster, but we showed that the accuracy of the results then will decline.\\ 
 We can conclude as well that the simulated annealer works better than the hill climber, as discussed in the analysis section.
