@@ -63,6 +63,7 @@ Finally we have two airline requirements. There is the requirement to have the s
 \section{Optimisation Algorithms}
 The most na\"ive way to approach an optimisation problem is to explore the entire state space and find the optimal solution in said space. We have developed a bruteforce algorithm to do just that, to be used for the simpler one plane scenario where bruteforcing is still computationally feasible. This allows us to apply simulated annealing to the same scenario and quantify its accuracy. We also developed a hill climber based on the same path generation and permutation code designed for the simulated annealer. The latter two algorithms can then be applied the more complex six plane scenario, where it is not computationally feasible anymore to bruteforce. The bruteforcer can be applied greedily to one plane at a time in the six plane scenario to allow for the same performance characteristics as the one plane scenario, but there is a danger of it finding a local optimum. The bruteforcer is however guaranteed to find the global optimum in the one plane scenario.
 \subsection{Brute-force}
+\label{subsec:bruteforce}
 The state space of a plane's flight schedule consists of all possible valid tours. The way the realised brute force algorithm explores this space is by traversing a tree of potentially valid schedules using a depth-first search. This tree is illustrated in figure~\ref{fig:tree}, with the homebase as the the root. Each node in the tree represents a potentially valid tour, each arrow going down being a flight and an additional flight from the node back the root being represented by a dashed grey arrow in figure~\ref{fig:tree}. The depth of the tree is determined by a doing a preliminary check on the validity of each node's schedule. To do this the minimum time taken up by the node's schedule is calculated. We can calculate the time in the air for all the flights represented in the schedule. And if there are $n$ flights, then there are $n-1$ dockings taking up time (the final docking can be outside our time window). And to calculate the time spent refueling the total flight distance is divided by the tank capacity distance (3199 km in our example scenario) and multiplied by the time taken for one refueling (60 minutes). This time can then be checked against the time window a schedule has. This test purposely underestimates the time for the potential schedules. Passing this test does however present a necessary, though not sufficient, condition for being an actually valid schedule. Thus it allows for a tree to be build, where a branch is terminated when it fails this preliminary test. During this preliminary test the flight back to the homebase is discounted, otherwise subtrees are cut that still contain valid schedules, even if the subtree's root node is not valid.\\
 \begin{figure}[!h]
 \centering
@@ -150,24 +151,31 @@ The temperature $T$ is gradually lowered as the iterations $i$ go up, in a logar
 T = \lambda^i \times T_0,
 \end{equation}
 with $\lambda$ being the cooling rate (values like $0.999$, $0.9999$, etc. used in our test runs) and $T_0$ the starting temperature. This probability will decrease with the number of iterations. Thus when the number of iterations increases, the temperature goes down. When temperature is high, the system will choose new states more or less at random, but as the temperature lowers this algorithm will go to hill-climbing. 
-\section{Result}
-To validate our method, demand and flight distances for a fictional airline are used. Mokum Airways, a newly created Dutch airline based in Amsterdam, has landing rights for 28 destinations around Europe. The airline has a fleet of six Airbus A321 aircrafts with speed of 800km/h, capacity of 199 and range of 3199 km. The take-off and landing take place between 02:00 and 06:00 and docking time and refuel time will take one hour. Moreover, once per day the plane needs to land in the home-base for the crew-change. The flight schedule has to be a cycle, so the start point and the end point of the route has to be the same.\\
-\begin{figure}[!h]
-\centering
-\includegraphics[width=2.5in]{europe}
-\caption{Mokum Airways destinations}
-\label{fig:europe}
-\end{figure}
-\\
-The first test scenario involves scheduling one airplane. The first simulations are run to observe general behaviour of the system. In figure~\ref{fig:simulated_annealing_score} the results are plotted for a simulation with initial temperature $T_0=\num{100000}$ and and cooling rate $\lambda=0.9999$. We can see that the simulation moves from fairly random to a hill-climber as the temperature lowers. This matches the expected behaviour for simulated annealing and serves as an important sanity check. The second thing to observe is that with a start temperature of $\num{100000}$ the system goes trough a significant period of randomness. Ideally we would like to pick a start temperature where the system doesn't have too much randomness and is starting to noticeably transition in its behaviour.\\
+\section{Results}
+%To validate our method, demand and flight distances for a fictional airline are used. Mokum Airways, a newly created Dutch airline based in Amsterdam, has landing rights for 28 destinations around Europe. The airline has a fleet of six Airbus A321 aircrafts with speed of 800km/h, capacity of 199 and range of 3199 km. The take-off and landing take place between 02:00 and 06:00 and docking time and refuel time will take one hour. Moreover, once per day the plane needs to land in the home-base for the crew-change. The flight schedule has to be a cycle, so the start point and the end point of the route has to be the same.\\
+%\begin{figure}[!h]
+%\centering
+%\includegraphics[width=2.5in]{europe}
+%\caption{Mokum Airways destinations}
+%\label{fig:europe}
+%\end{figure}
+%\\
+The first test scenario involves scheduling one airplane. The first simulations are run to observe general behaviour of the system. In figure~\ref{fig:simulated_annealing_score} the results are plotted for a simulation with initial temperature $T_0=\num{100000}$ and cooling rate $\lambda=0.9999$. We can see that the simulation moves from fairly random to a hill-climber as the temperature lowers. This matches the expected behaviour for simulated annealing and serves as an important sanity check. The second thing to observe is that with a start temperature of $\num{100000}$ the system goes through a significant period of randomness. Ideally we would like to pick a start temperature where the system doesn't have too much randomness and is starting to noticeably transition in its behaviour.\\
 There are rigorous methods to do this, where the exact temperature is calculated that leads to a $50\%$ acceptance rate. We have opted to judge things by eye and picked $T_0=\num{50000}$ as our start temperature. For six planes the start temperature is $T_0=\num{50000} \times 6$. The score goes up roughly by six when going to six plane simulations and multiplying the temperature by six roughly preserves the ratio in the exponent of equation~\ref{eq:transition_probability}. The simulations are terminated when there is no change in the accepted schedule for 1000 iterations. \\
 \begin{figure}[H]
 \centering
-\includegraphics[width=2.5in]{score_over_time}
+\includegraphics[width=2.9in]{score_over_time}
 \caption{Score over time for Simulated Annealing}
 \label{fig:simulated_annealing_score}
 \end{figure}
-The results of the best score with one airplane for different home-bases is plotted in figure(6). The home-bases with the highest score ($\num{2195766}$) are Barcelona, Helsinki and Reykjavik with the tours shown in figure \ref{fig:different_homebase_one_plane} and for the current home-base Amsterdam, the score would be $\num{2069202}$ with the tour shown in figure (\ref{fig:one_plane_amsterdam}). Acquiring these results took about two-three minutes per simulation.
+\subsection{Best schedule for one plane}
+\begin{figure}[!h]
+\centering
+\includegraphics[width=2.5in]{best_tour_one_plane_amsterdam}
+\caption{Best tour for one plane with homebase Amsterdam, passenger kilometer score $\num{2069202}$.}
+\label{fig:one_plane_amsterdam}
+\end{figure}
+For scenarios with one plane it is feasible to use a bruteforcer, as described in section~\ref{subsec:bruteforce}. When looking at schedules that have Amsterdam as the homebase, the flightschedule in figure~\ref{fig:one_plane_amsterdam} is found, with a score of $\num{2069202}$. Finding optimal schedules for different homebases can be done by running the bruteforcer with different cities as the homebase. The resulting scores are plotted in figure~\ref{fig:different_homebase_one_plane}. We can see that the best schedule seems to include Barcelona, Helsinki and Reykjavik. This tour is plotted in figure~\ref{fig:one_plane}, with a score of $\num{2195766}$. Any of the three cities can be chosen as start city.
 \\
 \begin{figure}[!h]
 \centering
@@ -182,15 +190,30 @@ The results of the best score with one airplane for different home-bases is plot
 \caption{Best tour for one plane with any homebase, passenger kilometer score $\num{2215268}$.}
 \label{fig:one_plane}
 \end{figure}
-\\
-The result for the main problem with six airplanes is shown in figure(10) for different home-bases. The results are shown both for the brute-force algorithm as for the simulated annealing. Moreover, the score with six identical airplanes that fly the best route for one airplane is given to make an analysis of the algorithms. See Analysis section. 
-\\
-\begin{figure}[!h]
+To analyze the accuracy of simulated annealing we can use the global optimum as found by bruteforce for one plane with Amsterdam as homebase as reference. We run simulated annealing on the same scenario with a particular cooling rate a hundred times. The results of these testruns are presented in table~\ref{tab:percentage_sa_optimal}. The first thing to notice is that simulated annealing is able to find the global optimum and that it is increasingly likely to find if the cooling rate is slower. This serves as a further sanity check. We also observe that simulation time goes up if the cooling rate is lower. An iteration takes about 4-5ms on our test setup, which means that we move from a run taking roughly a couple seconds for $\lambda=0.99$ to a run taking around 5 minutes with cooling rate $\lambda=0.99999$.
+\begin{table}[h]
 \centering
-\includegraphics[width=2.5in]{best_tour_one_plane_amsterdam}
-\caption{Best tour for one plane with homebase Amsterdam, passenger kilometer score $\num{2069202}$.}
-\label{fig:one_plane_amsterdam}
+\begin{tabular}{lll}
+Cooling Rate & Percentage global optimum found & Avg. nr. of iterations(std.dev.) \\
+0.99         & 4\%  & 1628.9($\pm 481.9$) \\
+0.999        & 6\%  & 2804.3($\pm 1004.3$) \\
+0.9999       & 38\% & 13559.6($\pm 5149.9$)  \\
+0.99999      & 83\% & 70111.5($\pm 20884.3$)
+\end{tabular}
+\caption{Percentage of 100 simulated annealing runs finding global optimum, $T_0 = \num{50000}$}
+\label{tab:percentage_sa_optimal}
+\end{table}
+\\
+We can further quantify the accuracy of the heuristic by calculating the root-mean-square error (RMSE) of the simulated annealing runs. This is presented as the black line in figure~\ref{fig:error_sa_hc}. We know that simulated annealing can find the global optimum and that if you invest more time by cooling more slowly the probability of finding that optimum go up and the RMSE goes down. We would like to know how effective simulated annealing is in spending its time compared to hill climbing. To this end a hillclimber is run for the same number of iterations as the average iteration counts of various simulated annealing cooling rate. This is presented as the red line in figure~\ref{fig:error_sa_hc}. For each iteration count a hundred runs have been executed. This hill-climber does not have a stop condition (i.e. quiting if the accepted schedule does not change for 1000 iterations). As an alternative the hill-climber is also run with this stop condition turned out, which means it will stop and restart multiple times if the iteration count is high enough. This is represented by the blue line, with again a 100 runs per iteration count.\\
+We can see that for the same time investment, simulated annealing tends to have a lower RMSE than both hill-climber plots. This would point at simulated annealing making more effective use of the same time. The simulated annealer is better at avoiding local maxima than even running multiple hill-climbing runs for the same time investment.
+\begin{figure}[H]
+\centering
+\includegraphics[width=2.5in]{iterations_vs_error_sa_hc}
+\caption{Error for Simulated Annealing and Hill-climbing.\tiny}
+\label{fig:error_sa_hc}
 \end{figure}
+\subsection{Best schedules for six planes}
+The result for the main problem with six airplanes is shown in figure(10) for different home-bases. The results are shown both for the brute-force algorithm as for the simulated annealing. Moreover, the score with six identical airplanes that fly the best route for one airplane is given to make an analysis of the algorithms. See Analysis section. 
 \\
 The best score with simulated annealing is $\num{12388745}$ with as home-base Amsterdam. The best home-base to choose is Lisbon with the highest score of $\num{12908931}$.  Acquiring these results now took about 10-30 minutes. This has a large variance, because of the random nature of simulated annealing.  What can clearly be seen is that most of the times the scores of the simulated annealer is not far off from our bruteforce approach. This indicates that our simulated annealer works quite well, further analysed in the analysis section.
 \\
@@ -210,26 +233,7 @@ Standard deviation of the n.o.i.: 45001.6193448
 The simulation needed quite a lot iterations before terminating. For this data, we have done five runs per home-base for 28 different home-bases, that's a total of 5*28 runs. What's remarkable is that both the algorithms have about the same peaks as the same peaks as the theoretical six-times-one-plane situation.  This indicates a strong correlation between these two and thus let us estimate the behavior of six planes for the behavior of one plane. See Analysis section. 
 \\
 \section{Analysis}
-To analyze the solution of simulated annealing. We use the result of the brute force for one airplane as reference, since the result is the global maximum. In table (1), the percentage of the global optimum found for simulated annealing is given for different cooling rates. When the decimals for the cooling rate increases, the percentage global optimum found will increase strongly, because more iterations will be run and therefore the probability to find the global optimum will be higher.
-\begin{table}[h]
-\begin{tabular}{ll}
-Cooling Rate & Percentage global optimum found \\
-0.99         & 4\%                             \\
-0.999        & 6\%                             \\
-0.9999       & 38\%                            \\
-0.99999      & 83\%                              
-\end{tabular}
-\caption{\tiny{Table 1, Score one airplane SA, 100 runs, T0 = 50.000}}
-\end{table}
-\\
-Moreover, the quality of our heuristics is tested. In figure (\ref{fig:error_sa_hc}), the RMSE of the score for simulated annealing is plotted as a black line. The number of iterations depends on the cooling rate, a lower cooling rate will increase the number of iterations and thereby the run time. However, the RMSE decreases with the number of iterations. Thus, the result will be more accurate.  To analyze the two heuristics, hill climbing and simulated annealing, we can look at the same figure (\ref{fig:error_sa_hc}) for both heuristics for the same iterations against the RMSE. The RMSE for the same iteration for the hill climber is higher than the simulated annealing. Thus, the simulated annealing is in this case better for finding the optimal solution than the hill climbing, since the risk to get into a local optimum is limited.\\
 An interesting analysis is whether the solution for one airplane can predict the solution for six airplanes. In figure (\ref{fig:error_sa_hc}), the score times 6 for one airplane follows almost the same pattern as the score of the simulated annealing for six airplanes for different home bases. We ran a correlation test.  This resulted in a correlation coefficient of 0.820 for simulated annealing. Therefore, we can conclude there is a correlation between the prediction for the score of six airplanes when the score for one airplane is known.\\
-\begin{figure}[H]
-\centering
-\includegraphics[width=2.5in]{iterations_vs_error_sa_hc}
-\caption{Error for Simulated Annealing and Hill-climbing.\tiny}
-\label{fig:error_sa_hc}
-\end{figure}
 
 \section{Discussion}
 In our tests simulated annealing either equals or underperforms in terms of score compared to the greedy bruteforcer. One known shortcoming of the greedy bruteforcer is that it can get stuck in a local optimum, where the best set of routes for e.g. six planes does not necessarily contain the best route for one plane. As more planes are added to the test scenario the chance the greedy application of a per-plane bruteforcer encounters a local optimum goes up. And the chance of the difference with the global optimum and the found solution being significant go up as well. In theory a simulated annealer (or other stochastic methods) should be better able to deal with this problem. It would be useful to research the behaviour of the greedy bruteforcer and the simulated annealer applied to scenarios with a lot more than six planes. \\
