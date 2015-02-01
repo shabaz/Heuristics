@@ -85,8 +85,7 @@ When permutating a tour, notice that we first shift it such that our home-base i
 We start with an initial random tour generated with the algorithm described above. To find a better solution, we permutate the tour. The score of the passenger-kilometers for the initial tour is stored in a variable best score. If the score of the permutation tour is higher than the score of the arbitrary tour, the score of the permutated tour will be the new best score and the permutation tour will be accepted, otherwise the best score will stay the same and we will stay at the previous tour. This process is repeated until no further improvements can be found and the best tour is the last accepted tour. When applied to multiple planes, first one of the planes in the system is randomly chosen and its flightplan (tour) is permutated. The total score of all airplane tours is then calculated and compared to the previous best score. If it improves on said score, the new tour is accepted.\\
 A disadvantage of hill-climbing is that it is good for finding a local optimum, but it is not guaranteed to find the best possible solution (global optimum). To avoid this disadvantage, we use a different algorithm, simulated annealing. \\
 \subsection{Simulated Annealing}
-In case of simulated annealing, it’s almost the same as hill climbing except when the solution is not improved, this solution will be accepted with a probability P. The probability is based on the number of iterations and the temperature. As the number of iterations increases, the temperature goes down and the probability will decrease. \\
-In figure~\ref{fig:flowchart_sa}, the flowchart of hill-climbing is adjusted in simulated annealing.\\
+Simulated annealing has the same iterative algorithm properties as the described hill-climber, using the same permutation method during iteration. And like hillclimbing, if a new tour is generated with a better score, it will always be used as input for the next iteration. However, when a permutation is encountered that does not improve the score, there is a chance it is used as input for the next iteration anyway. This allows the simulated annealer to more fully explore state space. The chance of it accepting a worse score is gradually lowered, so that it slowly transitions to a hill-climber, but ideally with a lower chance of it getting stuck in a local optimum than a straight up hill-climber. In figure~\ref{fig:flowchart_sa}, the flowchart of hill-climbing is adjusted in simulated annealing.\\
 \begin{figure}[!h]
 \centering
 \includegraphics{flowchart_sa}
@@ -94,8 +93,18 @@ In figure~\ref{fig:flowchart_sa}, the flowchart of hill-climbing is adjusted in 
 \label{fig:flowchart_sa}
 \end{figure}
 \\
-In the case when the passengers-kilometer score is not improved, you will accept the permutation tour with probability $P = e^{\frac{−\Delta C}{T}} $, where ∆C = score of the permutation tour − score of the current best tour and $T = 0, 999^i * T_0$ with $i$ is the number of iterations and $T_0$ is the start temperature 50.000.
- This probability will decrease with the number of iterations. Thus when the number of iterations increases, the temperature goes down. When temperature is high, the system will choose new states more or less at random, but as the temperature lowers this algorithm will go to hill-climbing. 
+In the case when the passengers-kilometer score is not improved, you will accept the permutation tour with probability 
+\begin{equation}
+P = e^{\frac{−\Delta C}{T}} ,
+\end{equation}where the difference in score is 
+\begin{equation}
+\Delta C = C_{\text{permuted}} - C_{\text{last accepted}}.
+\end{equation}
+The temperature $T$ is gradually lowered as the iterations $i$ go up, in a logarithmic manner using
+\begin{equation}
+T = \lambda^i \times T_0,
+\end{equation}
+with $\lambda$ being the cooling rate (values like $0.999$, $0.9999$, etc. used in our test runs) and $T_0$ the starting temperature. This probability will decrease with the number of iterations. Thus when the number of iterations increases, the temperature goes down. When temperature is high, the system will choose new states more or less at random, but as the temperature lowers this algorithm will go to hill-climbing. 
 \section{Result}
 To validate our method, demand and flight distances for a fictional airline are used. Mokum Airways, a newly created Dutch airline based in Amsterdam, has landing rights for 28 destinations around Europe.\\
 \begin{figure}[!h]
