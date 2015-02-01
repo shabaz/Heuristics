@@ -29,8 +29,8 @@
 
 
 \begin{abstract}
-%\boldmath
-Abstract text to go here.
+\boldmath
+The airline scheduling problem is central in the profitability of passenger oriented airlines. In this problem flights are scheduled for a number of planes, subject to several restrictions. We have implemented a simulated annealing algorithm. Novel compared to the literature is the permutation method, which can deal with graphs involving a high number of airports. We have analysed the accuracy of simulated annealing in a 1 plane scenario and found it settled on the global optimum at a rate of $83\%$. For this analysis a bruteforce algorithm was developped. We researched the best homebases and found Barcelona, Helsinki and Reykjavik for one plane and Lisbon for six planes. 
 \end{abstract}
 
 
@@ -111,11 +111,11 @@ This tour permutation method is inspired by \cite{Mashford2001}. They however af
 We start with an initial random tour generated with the algorithm described above. To find a better solution, we permutate the tour. The score of the passenger-kilometers for the initial tour is stored in a variable best score. If the score of the permutation tour is higher than the score of the arbitrary tour, the score of the permutated tour will be the new best score and the permutation tour will be accepted, otherwise the best score will stay the same and we will stay at the previous tour. This process is repeated until no further improvements can be found and the best tour is the last accepted tour. When applied to multiple planes, first one of the planes in the system is randomly chosen and its flightplan (tour) is permutated. The total score of all airplane tours is then calculated and compared to the previous best score. If it improves on said score, the new tour is accepted.\\
 A disadvantage of hill-climbing is that it is good for finding a local optimum, but it is not guaranteed to find the best possible solution (global optimum). To avoid this disadvantage, we use a different algorithm, simulated annealing. \\
 \subsection{Simulated Annealing}
-Simulated annealing has the same iterative algorithm properties as the described hill-climber, using the same permutation method during iteration. And like hillclimbing, if a new tour is generated with a better score, it will always be used as input for the next iteration. However, when a permutation is encountered that does not improve the score, there is a chance it is used as input for the next iteration anyway. This allows the simulated annealer to more fully explore state space. The chance of it accepting a worse score is gradually lowered, so that it slowly transitions to a hill-climber, but ideally with a lower chance of it getting stuck in a local optimum than a straight up hill-climber. In figure~\ref{fig:flowchart_sa}, the flowchart of hill-climbing is adjusted in simulated annealing.\\
+Simulated annealing has the same iterative algorithm properties as the described hill-climber, using the same permutation method during iteration. And like hillclimbing, if a new tour is generated with a better score, it will always be used as input for the next iteration. However, when a permutation is encountered that does not improve the score, there is a chance it is used as input for the next iteration anyway. This allows the simulated annealer to more fully explore state space. The chance of it accepting a worse score is gradually lowered, so that it slowly transitions to a hill-climber, but ideally with a lower chance of it getting stuck in a local optimum than a straight up hill-climber. In figure~\ref{fig:flowchart_sa}, an updated flowchart is presented, where the `score not improved' branch is adjusted according to the simulated annealing algorithm.\\
 \begin{figure}[!h]
 \centering
 %\includegraphics{flowchart_sa}
-\begin{tikzpicture}[node distance=4.5cm, scale=0.5, every node/.style={scale=0.5, align=center}]
+\begin{tikzpicture}[node distance=4.5cm, scale=0.45, every node/.style={scale=0.45, align=center}]
 \node (start) [startstop] {Start};
 \node (pro1) [process, right of=start] {Generate Random Tour};
 \node (pro2) [process, right of=pro1] {Permute Tour};
@@ -164,14 +164,14 @@ The first test scenario involves scheduling one airplane. The first simulations 
 There are rigorous methods to do this, where the exact temperature is calculated that leads to a $50\%$ acceptance rate. We have opted to judge things by eye and picked $T_0=\num{50000}$ as our start temperature. For six planes the start temperature is $T_0=\num{50000} \times 6$. The score goes up roughly by six when going to six plane simulations and multiplying the temperature by six roughly preserves the ratio in the exponent of equation~\ref{eq:transition_probability}. The simulations are terminated when there is no change in the accepted schedule for 1000 iterations. \\
 \begin{figure}[H]
 \centering
-\includegraphics[width=2.9in]{score_over_time}
+\includegraphics[width=2.5in]{score_over_time}
 \caption{Score over time for Simulated Annealing}
 \label{fig:simulated_annealing_score}
 \end{figure}
 \subsection{Best schedule for one plane}
 \begin{figure}[!h]
 \centering
-\includegraphics[width=2.5in]{best_tour_one_plane_amsterdam}
+\includegraphics[width=2.0in]{best_tour_one_plane_amsterdam}
 \caption{Best tour for one plane with homebase Amsterdam, passenger kilometer score $\num{2069202}$.}
 \label{fig:one_plane_amsterdam}
 \end{figure}
@@ -186,7 +186,7 @@ For scenarios with one plane it is feasible to use a bruteforcer, as described i
 \\
 \begin{figure}[!h]
 \centering
-\includegraphics[width=2.5in]{best_tour_one_plane}
+\includegraphics[width=2.0in]{best_tour_one_plane}
 \caption{Best tour for one plane with any homebase, passenger kilometer score $\num{2215268}$.}
 \label{fig:one_plane}
 \end{figure}
@@ -239,8 +239,7 @@ Finally we have done some exploratory work on applying Genetic Algorithms to thi
 %50% acceptance, start temp.
 
 \section{Conclusions}
-In conclusion we can say that our simulated annealer works very well. After analyzing the various results we see that compared to the bruteforcer our simulated annealer performs very close to it. Also with a runtime of between 10 and 30 minutes to find an optimal schedule for six airplanes, it is not all that slow. Of course one can do the simulation faster, but we showed that the accuracy of the results then will decline.\\
-We can conclude as well that the simulated annealer works better than the hill climber, as discussed in the analysis section. We also showed that the outcome of scheduling six airplanes can be predicted with the output of the simulation with one plane. We found a high correlation between the global optimum of one airplane and the global optimum of six airplanes, and this can be seen also in figure (\ref{fig:different_homebase_six_planes}), as the peaks agree of both sources.
+It has been possible to build a simulated annealing based algorithm that can solve the airline scheduling problem. To this end a schedule permutation method was developed that is novel. The simulated annealing method makes more effective use of time than hill climbing, because it does not get stuck in local optima as easily. We have found the global optimum for one plane with a homebase Amsterdam to have a passenger kilometer score of $\num{2069202}$. The best homebases for one planes are Barcelona, Helsinki and Reykjavik, with a schedule involving said cities with a score of $\num{2195766}$. For six planes the best homebase likely is Lisbon. The best result for six planes with homebase Amsterdam from simulated annealing is $\num{12388745}$ and from greedy bruteforcing is $\num{12403073}$. We speculate that the simulated annealer will be more likely to outperform the greedy bruteforcer with more plane, but this has not been showcased in our findings thus far.
 \bibliographystyle{IEEEtran}
 \bibliography{final_report}
 \end{document}
