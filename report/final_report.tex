@@ -26,13 +26,10 @@
 \begin{document}
 \maketitle
 
-
-
 \begin{abstract}
 \boldmath
-The airline scheduling problem is central in the profitability of passenger oriented airlines. In this problem flights are scheduled for a number of planes, subject to several restrictions. We have implemented a simulated annealing algorithm. Novel compared to the literature is the permutation method, which can deal with graphs involving a high number of airports. We have analysed the accuracy of simulated annealing in a 1 plane scenario and found it settled on the global optimum at a rate of $83\%$. For this analysis a bruteforce algorithm was developped. We researched the best homebases and found Barcelona, Helsinki and Reykjavik for one plane and Lisbon for six planes. 
+The airline scheduling problem is central in the profitability of passenger oriented airlines. Flights are scheduled for a number of planes, subject to several restrictions. We have implemented a simulated annealing algorithm. Novel compared to the literature is the permutation method, which can deal with graphs involving a high number of airports. We have analysed the accuracy of simulated annealing in a one plane scenario and found it settled on the global optimum at a rate of $83\%$. We researched the best homebases using a set of testdata and found Barcelona, Helsinki and Reykjavik for one plane scenario and Lisbon for a six planes scenario as the optimum. 
 \end{abstract}
-
 
 \section{Introduction}
 Flight schedules take up a central place in airline businesses. To maximize profit a business has to be as efficient as possible in using its resources and be as effective as possible in meeting marketplace demand. A business wants to plan its flights based on demand, use its airplanes to service these flights as efficiently as possible and assign crews to these flights to minimize expenses. These pose highly complex combinatorial optimization problems that cannot be solved analytically. Instead numerical optimization systems are used and their effectiveness can be influential on the profitability of a passenger focusses airline as a whole.\\
@@ -115,7 +112,7 @@ Simulated annealing has the same iterative algorithm properties as the described
 \begin{figure}[!h]
 \centering
 %\includegraphics{flowchart_sa}
-\begin{tikzpicture}[node distance=4.5cm, scale=0.45, every node/.style={scale=0.45, align=center}]
+\begin{tikzpicture}[node distance=4.5cm, scale=0.5, every node/.style={scale=0.5, align=center}]
 \node (start) [startstop] {Start};
 \node (pro1) [process, right of=start] {Generate Random Tour};
 \node (pro2) [process, right of=pro1] {Permute Tour};
