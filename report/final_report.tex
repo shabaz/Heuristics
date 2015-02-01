@@ -10,12 +10,17 @@
 \usepackage{float}
 \usepackage{listings}
 \usepackage{cite}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black]
+\tikzstyle{arrow} = [thick,->,>=stealth]
 
 \lstset{language=Python, basicstyle=\ttfamily\scriptsize, breaklines=true}
 
-\author{Chi Chun Wan -- 2525244\\
-Shabaz Sultan -- 2566703\\
-Boudewijn Zwaal -- 1897527}
+\author{Team CSB(3)\\Chi Chun Wan -- 2525244 \hspace{0.1\textwidth} Shabaz Sultan -- 2566703 \hspace{0.1\textwidth} Boudewijn Zwaal -- 1897527}
 \title{Airline Scheduling with Simulated Annealing}
 \begin{document}
 \maketitle
@@ -72,7 +77,26 @@ Hill-climbing and simulated annealing share a lot of similarities. They both sta
 \\
 \begin{figure}[!h]
 \centering
-\includegraphics[width=2.5in]{flowchart_hc}
+%\includegraphics[width=2.5in]{flowchart_hc}
+\begin{tikzpicture}[node distance=4.5cm, scale=0.5, every node/.style={scale=0.5, align=center}]
+\node (start) [startstop] {Start};
+\node (pro1) [process, right of=start] {Generate Random Tour};
+\node (pro2) [process, right of=pro1] {Permute Tour};
+\node (dec1) [decision, below of=start] {score\\improved?};
+\node (pro3) [process, right of=dec1] {Keep previous tour};
+\node (pro4) [process, below of=dec1] {Accept permuted tour};
+\node (dec2) [decision, right of=pro4] {Stop?};
+\node (stop) [startstop, right of=dec2] {Return last\\accepted tour};
+\draw [arrow] (start) -- (pro1);
+\draw [arrow] (pro1) -- (pro2);
+\draw [arrow] (pro2) -- (dec1);
+\draw [arrow] (pro3) -- (dec2);
+\draw [arrow] (pro4) -- (dec2);
+\draw [arrow] (dec1) -- node[right] {yes}(pro4);
+\draw [arrow] (dec1) -- node[below] {no}(pro3);
+\draw [arrow] (dec2) -- node[right] {no}(pro2);
+\draw [arrow] (dec2) -- node[above] {yes}(stop);
+\end{tikzpicture}
 \caption{Flowchart Hill-climbing}
 \label{fig:flowchart_hc}
 \end{figure}
@@ -88,13 +112,33 @@ A disadvantage of hill-climbing is that it is good for finding a local optimum, 
 Simulated annealing has the same iterative algorithm properties as the described hill-climber, using the same permutation method during iteration. And like hillclimbing, if a new tour is generated with a better score, it will always be used as input for the next iteration. However, when a permutation is encountered that does not improve the score, there is a chance it is used as input for the next iteration anyway. This allows the simulated annealer to more fully explore state space. The chance of it accepting a worse score is gradually lowered, so that it slowly transitions to a hill-climber, but ideally with a lower chance of it getting stuck in a local optimum than a straight up hill-climber. In figure~\ref{fig:flowchart_sa}, the flowchart of hill-climbing is adjusted in simulated annealing.\\
 \begin{figure}[!h]
 \centering
-\includegraphics{flowchart_sa}
+%\includegraphics{flowchart_sa}
+\begin{tikzpicture}[node distance=4.5cm, scale=0.5, every node/.style={scale=0.5, align=center}]
+\node (start) [startstop] {Start};
+\node (pro1) [process, right of=start] {Generate Random Tour};
+\node (pro2) [process, right of=pro1] {Permute Tour};
+\node (dec1) [decision, below of=start] {score\\improved?};
+\node (pro3) [process, right of=dec1] {Accept permuted tour\\with $P=e^{\frac{-\lambda C}{T}}$};
+\node (pro4) [process, below of=dec1] {Accept permuted tour};
+\node (dec2) [decision, right of=pro4] {Stop?};
+\node (stop) [startstop, right of=dec2] {Return last\\accepted tour};
+\draw [arrow] (start) -- (pro1);
+\draw [arrow] (pro1) -- (pro2);
+\draw [arrow] (pro2) -- (dec1);
+\draw [arrow] (pro3) -- (dec2);
+\draw [arrow] (pro4) -- (dec2);
+\draw [arrow] (dec1) -- node[right] {yes}(pro4);
+\draw [arrow] (dec1) -- node[below] {no}(pro3);
+\draw [arrow] (dec2) -- node[right] {no}(pro2);
+\draw [arrow] (dec2) -- node[above] {yes}(stop);
+\end{tikzpicture}
+
 \caption{Flowchart Simulated Annealing}
 \label{fig:flowchart_sa}
 \end{figure}
 \\
 In the case when the passengers-kilometer score is not improved, you will accept the permutation tour with probability 
-\begin{equation}
+\begin{equation}\label{eq:transition_probability}
 P = e^{\frac{−\Delta C}{T}} ,
 \end{equation}where the difference in score is 
 \begin{equation}
@@ -106,7 +150,7 @@ T = \lambda^i \times T_0,
 \end{equation}
 with $\lambda$ being the cooling rate (values like $0.999$, $0.9999$, etc. used in our test runs) and $T_0$ the starting temperature. This probability will decrease with the number of iterations. Thus when the number of iterations increases, the temperature goes down. When temperature is high, the system will choose new states more or less at random, but as the temperature lowers this algorithm will go to hill-climbing. 
 \section{Result}
-To validate our method, demand and flight distances for a fictional airline are used. Mokum Airways, a newly created Dutch airline based in Amsterdam, has landing rights for 28 destinations around Europe.\\
+To validate our method, demand and flight distances for a fictional airline are used. Mokum Airways, a newly created Dutch airline based in Amsterdam, has landing rights for 28 destinations around Europe. The airline has a fleet of six Airbus A321 aircrafts with speed of 800km/h, capacity of 199 and range of 3199 km. The take-off and landing take place between 02:00 and 06:00 and docking time and refuel time will take one hour. Moreover, once per day the plane needs to land in the home-base for the crew-change. The flight schedule has to be a cycle, so the start point and the end point of the route has to be the same.\\
 \begin{figure}[!h]
 \centering
 \includegraphics[width=2.5in]{europe}
@@ -114,23 +158,22 @@ To validate our method, demand and flight distances for a fictional airline are 
 \label{fig:europe}
 \end{figure}
 \\
-\begin{figure}[!h]
-\centering
-\includegraphics[width=2.5in]{different_homebases_one_plane}
-\caption{Global optimum for different homebases with one plane}
-\label{fig:different_homebase_one_plane}
-\end{figure}
-\\
-The airline has a fleet of six Airbus A321 aircrafts with speed of 800km/h, capacity of 199 and range of 3199 km. The take-off and landing take place between 02:00 and 06:00 and docking time and refuel time will take one hour. Moreover, once per day the plane needs to land in the home-base for the crew-change. The flight schedule has to be a cycle, so the start point and the end point of the route has to be the same.\\
-We first tested with scheduling one airplane, to set our parameters. For we could compare these results with the global optimum very early (obtained by bruteforcing), we could set the parameters such that we found that optimum the most. These settings are used in scheduling for six airplanes. The cooling rate of the simulated annealing was set at 0.99999. The initial temperature is set at 50.000 per plane, and thus in a simulation of six airplanes the initial temperature was 6*50.000. Finally we terminated the simulation when the accepted schedule had not changed for more than 1000 iterations. The obtained results was accurate, but the runtime was very high. \\
-In figure(\ref{fig:simulated_annealing_score}), the behavior of simulated annealing for the score is shown during the course of the simulation. In the beginning, when the temperature is high, the score is very random and as the temperature drops to lower values the score becomes less random and will look more like a hill climber. Finally, it converges to what the simulation believes is the global optimum (although this is not always the case).\\
+The first test scenario involves scheduling one airplane. The first simulations are run to observe general behaviour of the system. In figure~\ref{fig:simulated_annealing_score} the results are plotted for a simulation with initial temperature $T_0=100000$ and and cooling rate $\lambda=0.9999$. We can see that the simulation moves from fairly random to a hill-climber as the temperature lowers. This matches the expected behaviour for simulated annealing and serves as an important sanity check. The second thing to observe is that with a start temperature of $100000$ the system goes trough a significant period of randomness. Ideally we would like to pick a start temperature where the system doesn't have too much randomness and is starting to noticeably transition in its behaviour.\\
+There are rigorous methods to do this, where the exact temperature is calculated that leads to a $50\%$ acceptance rate. We have opted to judge things by eye and picked $T_0=50000$ as our start temperature. For six planes the start temperature is $T_0=50000 \times 6$. The score goes up roughly by six when going to six plane simulations and multiplying the temperature by six roughly preserves the ratio in the exponent of equation~\ref{eq:transition_probability}. The simulations are terminated when there is no change in the accepted schedule for 1000 iterations. \\
 \begin{figure}[H]
 \centering
 \includegraphics[width=2.5in]{score_over_time}
 \caption{Score over time for Simulated Annealing}
 \label{fig:simulated_annealing_score}
 \end{figure}
-The results of the best score with one airplane for different home-bases is plotted in figure(6). The home-bases with the highest score (2.195.766) are Barcelona, Helsinki and Reykjavik with the tours shown in figure \ref{fig:different_homebases_one_plane} and for the current home-base Amsterdam, the score would be 2.069.202 with the tour shown in figure (\ref{fig:one_plane_amsterdam}). Acquiring these results took about two-three minutes per simulation.
+The results of the best score with one airplane for different home-bases is plotted in figure(6). The home-bases with the highest score (2.195.766) are Barcelona, Helsinki and Reykjavik with the tours shown in figure \ref{fig:different_homebase_one_plane} and for the current home-base Amsterdam, the score would be 2.069.202 with the tour shown in figure (\ref{fig:one_plane_amsterdam}). Acquiring these results took about two-three minutes per simulation.
+\\
+\begin{figure}[!h]
+\centering
+\includegraphics[width=2.5in]{different_homebases_one_plane}
+\caption{Global optimum for different homebases with one plane}
+\label{fig:different_homebase_one_plane}
+\end{figure}
 \\
 \begin{figure}[!h]
 \centering
@@ -189,7 +232,7 @@ An interesting analysis is whether the solution for one airplane can predict the
 
 \section{Discussion}
 In our tests simulated annealing either equals or underperforms in terms of score compared to the greedy bruteforcer. One known shortcoming of the greedy bruteforcer is that it can get stuck in a local optimum, where the best set of routes for e.g. six planes does not necessarily contain the best route for one plane. As more planes are added to the test scenario the chance the greedy application of a per-plane bruteforcer encounters a local optimum goes up. And the chance of the difference with the global optimum and the found solution being significant go up as well. In theory a simulated annealer (or other stochastic methods) should be better able to deal with this problem. It would be useful to research the behaviour of the greedy bruteforcer and the simulated annealer applied to scenarios with a lot more than six planes. \\
-We speculate that this may be the reason that \cite{Mashford2001} tested only with a scenario containing a high number of aircraft (46) and a low number of airports (12). This maximizes the probability that other methods get stuck in local maxima. The low number of airports also allows \cite{Mashford2001} to go with a relatively simple route permutation algorithm, where all possible routes are enumerated between two points and one is chose. As the number of airports go up the number of paths becomes infeasibly large. These assumption are not made explicit by \cite{Mashford2001}, but our efforts in partially replicating their methods make us propose these may be unstated reasons for their validation scenario choice. \\
+We speculate that this may be the reason that \cite{Mashford2001} tested only with a scenario containing a high number of aircraft (46) and a low number of airports (12). This maximizes the probability that other methods get stuck in local maxima. The low number of airports also allows \cite{Mashford2001} to go with a relatively simple route permutation algorithm, where all possible routes are enumerated between two points and one is chosen. As the number of airports go up the number of paths becomes infeasibly large. These assumption are not made explicit by \cite{Mashford2001}, but our efforts in partially replicating their methods make us propose these may be unstated reasons for their validation scenario choice. \\
 While we do not generate a full tree of all possible paths possible between two airports like \cite{Mashford2001} for our path permutation code, we do have tree generation be a port of our algorithm. In the current version these tree are generated on-the-fly during each path permutation. An obvious candidate for performance optimization is to at least pre-generate a tree with a smaller time limit as bounding function. This could then possibly be integrated in the code so that generating code can be replaced by lookup code; an obvious application of the memoization optimisation technique. \\
 Both the hill-climber and the simulated annealer use a Markov chain to traverse the state space of possible schedules. The Hastings-Metropolis algorithm allows you to sample the space stochastically even when the underlying probability distribution is unknown \cite{Hasting1970}. To show that the Markov chain is able to generate all possible paths it is necessary to prove ergodicity; i.e. to prove that the Markov chain is both irreducible and aperiodic. And to make sure that the application of Hastings-Metropolis that is part of simulated annealing is valid it should be shown that every possible `neighbour' state is equally likely to be generated when permuting any of the possible routes. Proving both would be necessary if we're interested in showing theoretical correctness in further research. \\
 Finally we have done some exploratory work on applying Genetic Algorithms to this problem. The main challenge is constructing a method of creating new paths with two or more paths as its parents, with some additional mutation. This is equivalent to the construction of a permutation method being the primary challenge of applying a simulated annealing algorithm to a problem. From our literature study there are papers suggesting this approach to the airline scheduling problem and papers applying it to related problems like crew scheduling  (e.g. \cite{Levine1996}). But there is no literature actually applying it to the airline scheduling problem, so this may be interesting area of unexplored research.
