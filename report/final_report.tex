@@ -11,6 +11,7 @@
 \usepackage{listings}
 \usepackage{cite}
 \usepackage{tikz}
+\usepackage{siunitx}
 \usetikzlibrary{shapes.geometric, arrows}
 \tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black]
 \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black]
@@ -158,15 +159,15 @@ To validate our method, demand and flight distances for a fictional airline are 
 \label{fig:europe}
 \end{figure}
 \\
-The first test scenario involves scheduling one airplane. The first simulations are run to observe general behaviour of the system. In figure~\ref{fig:simulated_annealing_score} the results are plotted for a simulation with initial temperature $T_0=100000$ and and cooling rate $\lambda=0.9999$. We can see that the simulation moves from fairly random to a hill-climber as the temperature lowers. This matches the expected behaviour for simulated annealing and serves as an important sanity check. The second thing to observe is that with a start temperature of $100000$ the system goes trough a significant period of randomness. Ideally we would like to pick a start temperature where the system doesn't have too much randomness and is starting to noticeably transition in its behaviour.\\
-There are rigorous methods to do this, where the exact temperature is calculated that leads to a $50\%$ acceptance rate. We have opted to judge things by eye and picked $T_0=50000$ as our start temperature. For six planes the start temperature is $T_0=50000 \times 6$. The score goes up roughly by six when going to six plane simulations and multiplying the temperature by six roughly preserves the ratio in the exponent of equation~\ref{eq:transition_probability}. The simulations are terminated when there is no change in the accepted schedule for 1000 iterations. \\
+The first test scenario involves scheduling one airplane. The first simulations are run to observe general behaviour of the system. In figure~\ref{fig:simulated_annealing_score} the results are plotted for a simulation with initial temperature $T_0=\num{100000}$ and and cooling rate $\lambda=0.9999$. We can see that the simulation moves from fairly random to a hill-climber as the temperature lowers. This matches the expected behaviour for simulated annealing and serves as an important sanity check. The second thing to observe is that with a start temperature of $\num{100000}$ the system goes trough a significant period of randomness. Ideally we would like to pick a start temperature where the system doesn't have too much randomness and is starting to noticeably transition in its behaviour.\\
+There are rigorous methods to do this, where the exact temperature is calculated that leads to a $50\%$ acceptance rate. We have opted to judge things by eye and picked $T_0=\num{50000}$ as our start temperature. For six planes the start temperature is $T_0=\num{50000} \times 6$. The score goes up roughly by six when going to six plane simulations and multiplying the temperature by six roughly preserves the ratio in the exponent of equation~\ref{eq:transition_probability}. The simulations are terminated when there is no change in the accepted schedule for 1000 iterations. \\
 \begin{figure}[H]
 \centering
 \includegraphics[width=2.5in]{score_over_time}
 \caption{Score over time for Simulated Annealing}
 \label{fig:simulated_annealing_score}
 \end{figure}
-The results of the best score with one airplane for different home-bases is plotted in figure(6). The home-bases with the highest score (2.195.766) are Barcelona, Helsinki and Reykjavik with the tours shown in figure \ref{fig:different_homebase_one_plane} and for the current home-base Amsterdam, the score would be 2.069.202 with the tour shown in figure (\ref{fig:one_plane_amsterdam}). Acquiring these results took about two-three minutes per simulation.
+The results of the best score with one airplane for different home-bases is plotted in figure(6). The home-bases with the highest score ($\num{2195766}$) are Barcelona, Helsinki and Reykjavik with the tours shown in figure \ref{fig:different_homebase_one_plane} and for the current home-base Amsterdam, the score would be $\num{2069202}$ with the tour shown in figure (\ref{fig:one_plane_amsterdam}). Acquiring these results took about two-three minutes per simulation.
 \\
 \begin{figure}[!h]
 \centering
@@ -178,7 +179,7 @@ The results of the best score with one airplane for different home-bases is plot
 \begin{figure}[!h]
 \centering
 \includegraphics[width=2.5in]{best_tour_one_plane}
-\caption{Best tour for one plane with any homebase, passenger kilometer score 2.215.268.}
+\caption{Best tour for one plane with any homebase, passenger kilometer score $\num{2215268}$.}
 \label{fig:one_plane}
 \end{figure}
 \\
@@ -187,11 +188,11 @@ The result for the main problem with six airplanes is shown in figure(10) for di
 \begin{figure}[!h]
 \centering
 \includegraphics[width=2.5in]{best_tour_one_plane_amsterdam}
-\caption{Best tour for one plane with homebase Amsterdam, passenger kilometer score 2.069.202.}
+\caption{Best tour for one plane with homebase Amsterdam, passenger kilometer score $\num{2069202}$.}
 \label{fig:one_plane_amsterdam}
 \end{figure}
 \\
-The best score with simulated annealing is 12.388.745 with as home-base Amsterdam. The best home-base to choose is Lisbon with the highest score of 12.908.931.  Acquiring these results now took about 10-30 minutes. This has a large variance, because of the random nature of simulated annealing.  What can clearly be seen is that most of the times the scores of the simulated annealer is not far off from our bruteforce approach. This indicates that our simulated annealer works quite well, further analysed in the analysis section.
+The best score with simulated annealing is $\num{12388745}$ with as home-base Amsterdam. The best home-base to choose is Lisbon with the highest score of $\num{12908931}$.  Acquiring these results now took about 10-30 minutes. This has a large variance, because of the random nature of simulated annealing.  What can clearly be seen is that most of the times the scores of the simulated annealer is not far off from our bruteforce approach. This indicates that our simulated annealer works quite well, further analysed in the analysis section.
 \\
 \begin{figure}[!h]
 \centering
